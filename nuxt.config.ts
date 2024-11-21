@@ -9,6 +9,9 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "nuxt-auth-utils",
   ],
+  nitro: {
+    preset: "vercel-edge",
+  },
   shadcn: {
     prefix: "",
     componentDir: "./components/ui",
