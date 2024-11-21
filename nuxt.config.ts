@@ -9,14 +9,9 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "nuxt-auth-utils",
   ],
-  // nitro: {
-  //   preset: "cloudflare-pages",
-  //   esbuild: {
-  //     options: {
-  //       target: "esnext",
-  //     },
-  //   },
-  // },
+  nitro: {
+    preset: "node-server",
+  },
   shadcn: {
     prefix: "",
     componentDir: "./components/ui",
@@ -32,4 +27,5 @@ export default defineNuxtConfig({
     secret: process.env.SECRET,
     origin: process.env.ORIGIN,
   },
+  ssr: false,
 });
