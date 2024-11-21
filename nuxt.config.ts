@@ -9,9 +9,6 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "nuxt-auth-utils",
   ],
-  nitro: {
-    preset: "cloudflare-pages",
-  },
   shadcn: {
     prefix: "",
     componentDir: "./components/ui",
