@@ -10,7 +10,7 @@ export default defineNuxtConfig({
     "nuxt-auth-utils",
   ],
   nitro: {
-    preset: "node-server",
+    preset: "cloudflare-pages",
   },
   shadcn: {
     prefix: "",
