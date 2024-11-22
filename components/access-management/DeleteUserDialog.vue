@@ -12,8 +12,8 @@
         /></DialogTitle>
         <DialogDescription>
           <h3 class="mb-2 text-xl font-semibold text-slate-900">
-            Are you sure you want to remove {{ user.first_name }}
-            {{ user.last_name }}'s access
+            Are you sure you want to remove {{ user.firstName }}
+            {{ user.lastName }}'s access
           </h3>
           <p>
             Once removed, the user will no longer have the credentials to access

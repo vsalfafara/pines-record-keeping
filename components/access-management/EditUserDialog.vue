@@ -1,6 +1,6 @@
 <template>
   <Form v-slot="{ handleSubmit }" :validation-schema="formSchema">
-    <Dialog :open="dialogState" @update:open="(state) => (dialogState = state)">
+    <Dialog :open="dialogState" @update:open="handleOpenDialog">
       <DialogTrigger as-child>
         <Button variant="outline" size="icon"> <Pencil /> </Button>
       </DialogTrigger>
@@ -26,6 +26,7 @@
                 <Input
                   type="text"
                   placeholder="Input first name"
+                  :default-value="user.firstName"
                   v-bind="componentField"
                 />
               </FormControl>
@@ -39,6 +40,7 @@
                 <Input
                   type="text"
                   placeholder="Input last name"
+                  :default-value="user.lastName"
                   v-bind="componentField"
                 />
               </FormControl>
@@ -52,6 +54,7 @@
                 <Input
                   type="email"
                   placeholder="sample@gmail.com"
+                  :default-value="user.email"
                   v-bind="componentField"
                 />
               </FormControl>
@@ -88,7 +91,7 @@
           <FormField v-slot="{ componentField }" name="role">
             <FormItem>
               <FormLabel>Role *</FormLabel>
-              <Select v-bind="componentField">
+              <Select :default-value="user.role" v-bind="componentField">
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue
@@ -170,7 +173,7 @@ const { user } = defineProps<{
   user: User;
 }>();
 
-const formSchema = toTypedSchema(
+let formSchema = toTypedSchema(
   z.object({
     firstName: z.string().min(1).default(user.firstName),
     lastName: z.string().min(1).default(user.lastName),
@@ -179,6 +182,21 @@ const formSchema = toTypedSchema(
     role: z.enum(["ADMIN", "ACCOUNTS_CLERK"]).default(user.role),
   }),
 );
+
+function handleOpenDialog(state: boolean) {
+  dialogState.value = state;
+  if (state) {
+    formSchema = toTypedSchema(
+      z.object({
+        firstName: z.string().min(1).default(user.firstName),
+        lastName: z.string().min(1).default(user.lastName),
+        email: z.string().email().default(user.email),
+        password: z.string().min(6).optional(),
+        role: z.enum(["ADMIN", "ACCOUNTS_CLERK"]).default(user.role),
+      }),
+    );
+  }
+}
 
 async function handleUpdateUser(values: any) {
   loading.value = true;
