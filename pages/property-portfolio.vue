@@ -1,8 +1,8 @@
 <template>
   <NuxtLayout>
-    <h1 class="mb-2 text-2xl font-semibold">Access Management</h1>
+    <h1 class="mb-2 text-2xl font-semibold">Property Portfolio</h1>
     <p class="mb-4 text-muted-foreground">
-      Here's a list of all your admin access.
+      Here's a list of all your property ownings.
     </p>
     <div class="grid grid-cols-1 gap-2">
       <div
@@ -35,7 +35,7 @@
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <AddUserDialog @refresh="getUsers" />
+          <AddPropertyDialog @refresh="getProperties" />
         </div>
       </div>
       <div class="rounded-md border">
@@ -125,12 +125,21 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { Settings2, ArrowUpDown, LoaderCircle } from "lucide-vue-next";
+import {
+  Settings2,
+  Plus,
+  ArrowUpDown,
+  LoaderCircle,
+  Trash,
+  Pencil,
+} from "lucide-vue-next";
 import { valueUpdater } from "~/lib/utils";
 import { useDateFormat } from "@vueuse/core";
-import AddUserDialog from "~/components/access-management/AddUserDialog.vue";
-import EditUserDialog from "~/components/access-management/EditUserDialog.vue";
-import DeleteUserDialog from "~/components/access-management/DeleteUserDialog.vue";
+import AddPropertyDialog from "~/components/property-portfolio/AddPropertyDialog.vue";
+import EditPropertyDialog from "~/components/property-portfolio/EditPropertyDialog.vue";
+import DeletePropertyDialog from "~/components/property-portfolio/DeletePropertyDialog.vue";
+
+import type { Property } from "~/db/schema";
 
 useHead({
   title: "Access Management",
@@ -146,14 +155,13 @@ export type User = {
   createdAt: string;
 };
 
-const { user: userSession } = useUserSession();
-const users = ref<User[]>([]);
+const properties = ref<Property[]>([]);
 const loading = ref<boolean>(false);
 
-const columnHelper = createColumnHelper<User>();
+const columnHelper = createColumnHelper<Property>();
 
 const columns = [
-  columnHelper.accessor("firstName", {
+  columnHelper.accessor("name", {
     header: ({ column }) => {
       return h(
         Button,
@@ -161,12 +169,12 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["First Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("firstName")),
+    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("name")),
   }),
-  columnHelper.accessor("lastName", {
+  columnHelper.accessor("noOfBlocks", {
     header: ({ column }) => {
       return h(
         Button,
@@ -174,12 +182,12 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Last Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["# of Blocks", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("lastName")),
+    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("noOfBlocks")),
   }),
-  columnHelper.accessor("role", {
+  columnHelper.accessor("noOfLots", {
     header: ({ column }) => {
       return h(
         Button,
@@ -187,24 +195,12 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Role", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["# of Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => {
-      let role: any = row.getValue("role");
-
-      role = role
-        .split("_")
-        .map(
-          (word: string) => word[0].toUpperCase() + word.slice(1).toLowerCase()
-        )
-        .join(" ")
-        .trim();
-
-      return h("div", { class: "px-4" }, role);
-    },
+    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("noOfLots")),
   }),
-  columnHelper.accessor("email", {
+  columnHelper.accessor("takenLots", {
     header: ({ column }) => {
       return h(
         Button,
@@ -212,10 +208,24 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Email Address", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Taken Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("email")),
+    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("takenLots")),
+  }),
+  columnHelper.accessor("availableLots", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Available Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) =>
+      h("div", { class: "px-4" }, row.getValue("availableLots")),
   }),
   columnHelper.accessor("createdBy", {
     header: ({ column }) => {
@@ -230,52 +240,33 @@ const columns = [
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("createdBy")),
   }),
-  columnHelper.accessor("createdAt", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Created At", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => {
-      return h(
-        "div",
-        { class: "px-4" },
-        useDateFormat(row.getValue("createdAt"), "DD MMM YYYY").value
-      );
-    },
-  }),
-  columnHelper.display({
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const user = row.original;
+  // columnHelper.display({
+  //   id: "actions",
+  //   enableHiding: false,
+  //   cell: ({ row }) => {
+  //     const user = row.original;
 
-      const actions = [];
+  //     const actions = [];
 
-      actions.push(h(EditUserDialog, { user, onRefresh: () => getUsers() }));
+  //     actions.push(h(EditUserDialog, { property, onRefresh: () => getUsers() }));
 
-      if (userSession.value?.id !== user.id) {
-        actions.push(
-          h(DeleteUserDialog, {
-            user,
-            onRefresh: () => getUsers(),
-          })
-        );
-      }
-      return h(
-        "div",
-        {
-          class: "flex items-center gap-2 justify-end",
-        },
-        actions
-      );
-    },
-  }),
+  //     if (userSession.value?.id !== user.id) {
+  //       actions.push(
+  //         h(DeleteUserDialog, {
+  //           user,
+  //           onRefresh: () => getUsers(),
+  //         })
+  //       );
+  //     }
+  //     return h(
+  //       "div",
+  //       {
+  //         class: "flex items-center gap-2 justify-end",
+  //       },
+  //       actions
+  //     );
+  //   },
+  // }),
 ];
 
 const sorting = ref<SortingState>([]);
@@ -283,7 +274,7 @@ const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
 
 const table = useVueTable({
-  data: users,
+  data: properties,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -311,18 +302,16 @@ const table = useVueTable({
   },
 });
 
-onMounted(async () => getUsers());
+onMounted(async () => getProperties());
 
-async function getUsers() {
+async function getProperties() {
   loading.value = true;
   try {
-    const data = await $fetch("/api/users/all");
-    users.value = data as any;
+    const data = await $fetch("/api/properties/all");
+    properties.value = data as any;
   } catch (error) {
     console.log(error);
   }
   loading.value = false;
 }
 </script>
-
-<style scoped></style>

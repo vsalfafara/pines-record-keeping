@@ -8,6 +8,41 @@
       "when": 1732213793827,
       "tag": "0000_ordinary_dragon_lord",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1732560288655,
+      "tag": "0001_early_dracula",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1732562144164,
+      "tag": "0002_serious_invaders",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1732562878950,
+      "tag": "0003_robust_starfox",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1732566044828,
+      "tag": "0004_odd_northstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1732566070630,
+      "tag": "0005_big_shockwave",
+      "breakpoints": true
     }
   ]
 }

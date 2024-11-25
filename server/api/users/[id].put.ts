@@ -11,6 +11,16 @@ export default defineEventHandler(async (event) => {
     let hashedPassword = null;
 
     if (id) {
+      user = await db.query.users.findFirst({
+        where: eq(users.id, parseInt(id)),
+      });
+      if (!user) {
+        setResponseStatus(event, 404);
+        return {
+          message: "User not found",
+        };
+      }
+
       const userExistingPassword = await db.query.users.findFirst({
         where: eq(users.id, parseInt(id)),
         columns: { password: true },

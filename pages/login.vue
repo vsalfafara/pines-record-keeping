@@ -93,7 +93,7 @@ const formSchema = toTypedSchema(
   z.object({
     email: z.string().email(),
     password: z.string(),
-  }),
+  })
 );
 
 const { handleSubmit } = useForm({

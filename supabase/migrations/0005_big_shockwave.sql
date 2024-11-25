@@ -1,0 +1,1 @@
+ALTER TABLE "pines-dev"."properties" ALTER COLUMN "available_lots" SET DEFAULT 0;

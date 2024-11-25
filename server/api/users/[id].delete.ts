@@ -8,6 +8,15 @@ export default defineEventHandler(async (event) => {
     let user: any = null;
 
     if (id) {
+      user = await db.query.users.findFirst({
+        where: eq(users.id, parseInt(id)),
+      });
+      if (!user) {
+        setResponseStatus(event, 404);
+        return {
+          message: "User not found",
+        };
+      }
       user = await db
         .delete(users)
         .where(eq(users.id, parseInt(id)))

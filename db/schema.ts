@@ -21,5 +21,19 @@ export const users = schema.table("users", {
   createdAt: t.date("created_at", { mode: "date" }).defaultNow(),
 });
 
+export const properties = schema.table("properties", {
+  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: t.varchar("name"),
+  fullAddress: t.varchar("full_address"),
+  noOfBlocks: t.integer("number_of_blocks"),
+  noOfLots: t.integer("number_of_lots").default(0),
+  takenLots: t.integer("taken_lots").default(0),
+  availableLots: t.integer("available_lots").default(0),
+  createdBy: t.varchar("created_by"),
+});
+
 export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;
+
+export type Property = InferSelectModel<typeof properties>;
+export type NewProperty = InferInsertModel<typeof properties>;

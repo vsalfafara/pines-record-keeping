@@ -1,6 +1,3 @@
-CREATE SCHEMA "pines-dev";
---> statement-breakpoint
-CREATE TYPE "public"."role" AS ENUM('ADMIN', 'ACCOUNTS_CLERK');--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."users" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "pines-dev"."users_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"first_name" varchar NOT NULL,

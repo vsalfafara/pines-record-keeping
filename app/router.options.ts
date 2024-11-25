@@ -13,5 +13,10 @@ export default {
       path: "/access-management",
       component: () => import("~/pages/access-management.vue"),
     },
+    {
+      name: "Property Portfolio",
+      path: "/property-portfolio",
+      component: () => import("~/pages/property-portfolio.vue"),
+    },
   ],
 } satisfies RouterConfig;

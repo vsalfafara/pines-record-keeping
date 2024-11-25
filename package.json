@@ -7,9 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "push:migration": "npx prisma migrate dev",
-    "fresh:migration": "npx prisma migrate reset"
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@nuxt/image": "^1.8.1",
