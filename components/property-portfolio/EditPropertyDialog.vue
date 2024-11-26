@@ -74,7 +74,7 @@
               </CardHeader>
               <CardContent
                 v-if="blocks.length"
-                class="max-h-[calc(100vh-400px)] overflow-y-auto"
+                class="max-h-[calc(100vh-400px)] overflow-y-auto pt-1"
               >
                 <div v-for="(block, blockId) in blocks" :key="block.key">
                   <Separator v-if="blockId !== 0" class="my-4" />
