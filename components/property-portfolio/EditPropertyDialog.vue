@@ -72,7 +72,10 @@
                   >
                 </div>
               </CardHeader>
-              <CardContent v-if="blocks.length">
+              <CardContent
+                v-if="blocks.length"
+                class="max-h-[calc(100vh-400px)] overflow-y-auto"
+              >
                 <div v-for="(block, blockId) in blocks" :key="block.key">
                   <Separator v-if="blockId !== 0" class="my-4" />
                   <FormField
@@ -124,8 +127,8 @@
                               <Input
                                 type="text"
                                 placeholder="Input lot name"
-                                :default-value="`Lot ${lotId + 1}`"
                                 v-bind="componentField"
+                                :default-value="`Lot ${lotId + 1}`"
                               />
                             </FormControl>
                             <FormMessage />
