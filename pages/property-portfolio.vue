@@ -142,7 +142,7 @@ import DeletePropertyDialog from "~/components/property-portfolio/DeleteProperty
 import type { Property } from "~/db/schema";
 
 useHead({
-  title: "Access Management",
+  title: "Property Porfolio",
 });
 
 const properties = ref<Property[]>([]);
