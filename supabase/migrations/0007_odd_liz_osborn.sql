@@ -1,0 +1,1 @@
+ALTER TABLE "pines-dev"."properties" ALTER COLUMN "number_of_blocks" SET DEFAULT 0;

@@ -23,13 +23,14 @@ export const users = schema.table("users", {
 
 export const properties = schema.table("properties", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: t.varchar("name"),
-  fullAddress: t.varchar("full_address"),
-  noOfBlocks: t.integer("number_of_blocks"),
+  name: t.varchar("name").notNull(),
+  fullAddress: t.varchar("full_address").notNull(),
+  noOfBlocks: t.integer("number_of_blocks").default(0),
   noOfLots: t.integer("number_of_lots").default(0),
   takenLots: t.integer("taken_lots").default(0),
   availableLots: t.integer("available_lots").default(0),
   createdBy: t.varchar("created_by"),
+  createdAt: t.date("created_at", { mode: "date" }).defaultNow(),
 });
 
 export type User = InferSelectModel<typeof users>;

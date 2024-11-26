@@ -91,9 +91,7 @@
               <Select v-bind="componentField">
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue
-                      placeholder="Select a verified email to display"
-                    />
+                    <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

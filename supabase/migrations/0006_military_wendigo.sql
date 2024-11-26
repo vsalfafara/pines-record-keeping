@@ -1,0 +1,1 @@
+ALTER TABLE "pines-dev"."properties" ADD COLUMN "created_at" date DEFAULT now();

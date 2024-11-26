@@ -145,16 +145,6 @@ useHead({
   title: "Access Management",
 });
 
-export type User = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: "ADMIN" | "ACCOUNTS_CLERK";
-  createdBy: string;
-  createdAt: string;
-};
-
 const properties = ref<Property[]>([]);
 const loading = ref<boolean>(false);
 
@@ -173,6 +163,19 @@ const columns = [
       );
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("name")),
+  }),
+  columnHelper.accessor("fullAddress", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Full Address", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("fullAddress")),
   }),
   columnHelper.accessor("noOfBlocks", {
     header: ({ column }) => {
@@ -240,33 +243,52 @@ const columns = [
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("createdBy")),
   }),
-  // columnHelper.display({
-  //   id: "actions",
-  //   enableHiding: false,
-  //   cell: ({ row }) => {
-  //     const user = row.original;
+  columnHelper.accessor("createdAt", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Created At", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) => {
+      return h(
+        "div",
+        { class: "px-4" },
+        useDateFormat(row.getValue("createdAt"), "DD MMM YYYY").value
+      );
+    },
+  }),
+  columnHelper.display({
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const property = row.original;
 
-  //     const actions = [];
+      const actions = [];
 
-  //     actions.push(h(EditUserDialog, { property, onRefresh: () => getUsers() }));
+      actions.push(
+        h(EditPropertyDialog, { property, onRefresh: () => getProperties() })
+      );
 
-  //     if (userSession.value?.id !== user.id) {
-  //       actions.push(
-  //         h(DeleteUserDialog, {
-  //           user,
-  //           onRefresh: () => getUsers(),
-  //         })
-  //       );
-  //     }
-  //     return h(
-  //       "div",
-  //       {
-  //         class: "flex items-center gap-2 justify-end",
-  //       },
-  //       actions
-  //     );
-  //   },
-  // }),
+      actions.push(
+        h(DeletePropertyDialog, {
+          property,
+          onRefresh: () => getProperties(),
+        })
+      );
+      return h(
+        "div",
+        {
+          class: "flex items-center gap-2 justify-end",
+        },
+        actions
+      );
+    },
+  }),
 ];
 
 const sorting = ref<SortingState>([]);

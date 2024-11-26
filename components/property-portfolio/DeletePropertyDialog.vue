@@ -12,12 +12,11 @@
         /></DialogTitle>
         <DialogDescription>
           <h3 class="mb-2 text-xl font-semibold text-slate-900">
-            Are you sure you want to remove {{ user.firstName }}
-            {{ user.lastName }}'s access
+            Are you sure you want to remove {{ property.name }}?
           </h3>
           <p>
-            Once removed, the user will no longer have the credentials to access
-            the application.
+            Once removed, it will no longer be available as an option to be
+            bought by clients.
           </p>
         </DialogDescription>
       </DialogHeader>
@@ -31,7 +30,7 @@
           @click="handleDeleteUser"
         >
           <LoaderCircle v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
-          {{ loading ? "Deleting user..." : "Delete" }}
+          {{ loading ? "Deleting property..." : "Delete" }}
         </Button>
       </DialogFooter>
     </DialogContent>
@@ -50,11 +49,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Trash, LoaderCircle } from "lucide-vue-next";
-import type { User } from "~/pages/access-management.vue";
 import { useToast } from "@/components/ui/toast/use-toast";
+import type { Property } from "~/db/schema";
 
-const { user } = defineProps<{
-  user: User;
+const { property } = defineProps<{
+  property: Property;
 }>();
 
 const emit = defineEmits(["refresh"]);
@@ -66,7 +65,7 @@ const dialogState = ref<boolean>(false);
 async function handleDeleteUser() {
   loading.value = true;
   try {
-    const response: any = await $fetch(`/api/users/${user.id}`, {
+    const response: any = await $fetch(`/api/properties/${property.id}`, {
       method: "delete",
     });
     toast({

@@ -18,7 +18,7 @@
         </DialogHeader>
         <form
           id="dialogForm"
-          class="grid grid-cols-2 gap-2"
+          class="grid gap-2"
           @submit="handleSubmit($event, handleCreateProperty)"
         >
           <FormField v-slot="{ componentField }" name="name">
@@ -34,36 +34,19 @@
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField v-slot="{ componentField }" name="noOfBlocks">
+          <FormField v-slot="{ componentField }" name="fullAddress">
             <FormItem>
-              <FormLabel># of Blocks</FormLabel>
+              <FormLabel>Full Address *</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
-                  placeholder="0"
-                  min="0"
-                  default-value="0"
+                  type="text"
+                  placeholder="Input full address (unit/lot no, barangay, city, country)"
                   v-bind="componentField"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
-          <div class="col-span-2">
-            <FormField v-slot="{ componentField }" name="fullAddress">
-              <FormItem>
-                <FormLabel>Full Address *</FormLabel>
-                <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="Input full address (unit/lot no, barangay, city, country)"
-                    v-bind="componentField"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-          </div>
         </form>
         <DialogFooter>
           <DialogClose as-child>
@@ -71,7 +54,7 @@
           </DialogClose>
           <Button type="submit" form="dialogForm" :disabled="loading">
             <LoaderCircle v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
-            {{ loading ? "Creating user..." : "Confirm" }}
+            {{ loading ? "Creating property..." : "Confirm" }}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -107,20 +90,17 @@ import { useToast } from "@/components/ui/toast/use-toast";
 
 const emit = defineEmits(["refresh"]);
 const { toast } = useToast();
-const passwordFieldType = ref<string>("password");
 const loading = ref<boolean>(false);
 const dialogState = ref<boolean>(false);
 
 const formSchema = toTypedSchema(
   z.object({
-    name: z.string().min(1),
-    noOfBlocks: z.number().min(0).default(0),
-    fullAddress: z.string(),
+    name: z.string().min(1, { message: "Please enter a property name" }),
+    fullAddress: z.string().min(1, { message: "Please enter an address" }),
   })
 );
 
 async function handleCreateProperty(values: any) {
-  console.log(values);
   loading.value = true;
   try {
     const { user } = useUserSession();
@@ -129,7 +109,6 @@ async function handleCreateProperty(values: any) {
       ...values,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
     };
-    console.log(body);
     const response: any = await $fetch("/api/properties/create", {
       method: "POST",
       body,
