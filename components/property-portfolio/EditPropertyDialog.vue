@@ -83,18 +83,22 @@
                     :name="`blocks[${blockId}].name`"
                   >
                     <FormItem>
-                      <div class="mb-2 flex items-center gap-2">
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Input block name"
-                            v-bind="componentField"
-                          />
-                        </FormControl>
+                      <div class="mb-2 flex items-end gap-2">
+                        <div class="flex-1">
+                          <FormLabel>Block Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Input block name"
+                              v-bind="componentField"
+                            />
+                          </FormControl>
+                        </div>
                         <Button
                           type="button"
                           variant="outline"
                           size="icon"
+                          class="mb-[2px]"
                           @click="removeBlock(blockId)"
                           ><Trash
                         /></Button>
@@ -122,7 +126,6 @@
                           :name="`blocks[${blockId}].lots[${lotId}].name`"
                         >
                           <FormItem>
-                            <FormLabel>Name *</FormLabel>
                             <FormControl>
                               <Input
                                 type="text"
