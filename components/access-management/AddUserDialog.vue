@@ -15,7 +15,7 @@
           </DialogDescription>
         </DialogHeader>
         <form
-          id="dialogForm"
+          id="userForm"
           class="grid grid-cols-2 gap-2"
           @submit="handleSubmit($event, handleCreateUser)"
         >
@@ -113,7 +113,7 @@
           <DialogClose as-child>
             <Button type="button" variant="outline"> Cancel </Button>
           </DialogClose>
-          <Button type="submit" form="dialogForm" :disabled="loading">
+          <Button type="submit" form="userForm" :disabled="loading">
             <LoaderCircle v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
             {{ loading ? "Creating user..." : "Confirm" }}
           </Button>

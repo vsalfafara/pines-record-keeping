@@ -1,14 +1,95 @@
 <template>
   <NuxtLayout>
-    <h1 class="mb-2 text-2xl font-semibold">Property Portfolio</h1>
+    <h1 class="mb-2 text-2xl font-semibold">{{ property?.name }}</h1>
     <p class="mb-4 text-muted-foreground">
-      Here's a list of all your property ownings.
+      Below are the details and blocks of this property.
     </p>
-    <div class="grid grid-cols-1 gap-2">
+    <div class="grid grid-cols-1 gap-4">
+      <Form
+        v-if="property"
+        :validation-schema="formSchema"
+        :initial-values="property"
+        @submit="handleUpdateProperty"
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle class="flex items-center justify-between">
+              <p class="text-base font-semibold text-blue-600">
+                Property Information
+              </p>
+              <Button type="submit" :disabled="loading">
+                <LoaderCircle
+                  v-if="loading"
+                  class="mr-2 h-4 w-4 animate-spin"
+                />
+                {{ loading ? "Saving Changes..." : "Save Changes" }}
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="grid grid-cols-4 gap-4">
+              <FormField v-slot="{ componentField }" name="name">
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      v-bind="componentField"
+                      :default-value="property.name"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="fullAddress">
+                <FormItem>
+                  <FormLabel>Full Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      v-bind="componentField"
+                      :default-value="property.fullAddress"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+              <FormField name="createdAt">
+                <FormItem>
+                  <FormLabel>Created At</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      :default-value="
+                        useDateFormat(property.createdAt, 'DD MMM YYYY').value
+                      "
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+              <FormField name="createdBy">
+                <FormItem>
+                  <FormLabel>Created By</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      :default-value="property.createdBy"
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+            </div>
+          </CardContent>
+        </Card>
+      </Form>
       <div
         class="flex flex-col items-end justify-between gap-2 lg:flex-row lg:items-center"
       >
-        <Input placeholder="Search" class="max-w-[384px]" />
+        <p class="font-semibold text-blue-600">Blocks</p>
         <div class="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
@@ -35,7 +116,11 @@
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <AddPropertyDialog @refresh="getProperties" />
+          <AddBlockDialog
+            v-if="property"
+            :property-id="property.id"
+            @refresh="getProperty"
+          />
         </div>
       </div>
       <div class="rounded-md border">
@@ -94,24 +179,8 @@
 
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import type {
   ColumnFiltersState,
-  ExpandedState,
   SortingState,
   VisibilityState,
 } from "@tanstack/vue-table";
@@ -125,6 +194,8 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
+import { toTypedSchema } from "@vee-validate/zod";
+import * as z from "zod";
 import {
   Settings2,
   Plus,
@@ -133,22 +204,36 @@ import {
   Trash,
   Pencil,
 } from "lucide-vue-next";
+import AddBlockDialog from "~/components/property-portfolio/block/AddBlockDialog.vue";
+import DeleteBlockDialog from "~/components/property-portfolio/block/DeleteBlockDialog.vue";
 import { valueUpdater } from "~/lib/utils";
 import { useDateFormat } from "@vueuse/core";
-import AddPropertyDialog from "~/components/property-portfolio/AddPropertyDialog.vue";
-import EditPropertyDialog from "~/components/property-portfolio/EditPropertyDialog.vue";
-import DeletePropertyDialog from "~/components/property-portfolio/DeletePropertyDialog.vue";
+import { useToast } from "@/components/ui/toast/use-toast";
 
-import type { Property } from "~/db/schema";
+import type { Block, Property } from "~/db/schema";
+import EditBlockDialog from "~/components/property-portfolio/block/EditBlockDialog.vue";
 
 useHead({
   title: "Property Porfolio",
 });
 
-const properties = ref<Property[]>([]);
+const { params } = useRoute();
+const { id } = params;
+const { toast } = useToast();
+
+const property = ref<Property>();
+
+const blocks = ref<Block[]>([]);
 const loading = ref<boolean>(false);
 
-const columnHelper = createColumnHelper<Property>();
+const formSchema = toTypedSchema(
+  z.object({
+    name: z.string().min(1, { message: "Please enter a property name" }),
+    fullAddress: z.string().min(1, { message: "Please enter an address" }),
+  })
+);
+
+const columnHelper = createColumnHelper<Block>();
 
 const columns = [
   columnHelper.accessor("name", {
@@ -159,89 +244,10 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Block Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("name")),
-  }),
-  columnHelper.accessor("fullAddress", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Full Address", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("fullAddress")),
-  }),
-  columnHelper.accessor("noOfBlocks", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["# of Blocks", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("noOfBlocks")),
-  }),
-  columnHelper.accessor("noOfLots", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["# of Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("noOfLots")),
-  }),
-  columnHelper.accessor("takenLots", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Taken Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("takenLots")),
-  }),
-  columnHelper.accessor("availableLots", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Available Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) =>
-      h("div", { class: "px-4" }, row.getValue("availableLots")),
-  }),
-  columnHelper.accessor("createdBy", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Created By", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("createdBy")),
   }),
   columnHelper.accessor("createdAt", {
     header: ({ column }) => {
@@ -266,18 +272,21 @@ const columns = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const property = row.original;
+      const block = row.original;
 
       const actions = [];
 
       actions.push(
-        h(EditPropertyDialog, { property, onRefresh: () => getProperties() })
+        h(EditBlockDialog, {
+          blockData: block,
+          onRefresh: () => getProperty(),
+        })
       );
 
       actions.push(
-        h(DeletePropertyDialog, {
-          property,
-          onRefresh: () => getProperties(),
+        h(DeleteBlockDialog, {
+          block,
+          onRefresh: () => getProperty(),
         })
       );
       return h(
@@ -296,7 +305,7 @@ const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
 
 const table = useVueTable({
-  data: properties,
+  data: blocks,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -324,15 +333,42 @@ const table = useVueTable({
   },
 });
 
-onMounted(async () => getProperties());
+onMounted(async () => getProperty());
 
-async function getProperties() {
+async function getProperty() {
   loading.value = true;
   try {
-    const data = await $fetch("/api/properties/all");
-    properties.value = data as any;
+    const data = await $fetch(`/api/properties/${id}`);
+    property.value = data as any;
+    blocks.value = property.value?.blocks || [];
   } catch (error) {
     console.log(error);
+  }
+  loading.value = false;
+}
+
+async function handleUpdateProperty(values: any) {
+  loading.value = true;
+  try {
+    const response: any = await $fetch(
+      `/api/properties/${property.value?.id}`,
+      {
+        method: "PUT",
+        body: { ...values },
+      }
+    );
+    toast({
+      title: "Success",
+      description: response.message,
+      variant: "success",
+    });
+  } catch (error) {
+    console.log(error);
+    toast({
+      title: "Error",
+      description: "Something went wrong",
+      variant: "destructive",
+    });
   }
   loading.value = false;
 }

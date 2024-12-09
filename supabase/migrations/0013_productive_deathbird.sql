@@ -1,0 +1,1 @@
+ALTER TABLE "pines-dev"."lots" ADD COLUMN "remarks" varchar;

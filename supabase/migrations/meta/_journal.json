@@ -64,6 +64,41 @@
       "when": 1732625891104,
       "tag": "0008_neat_robin_chapel",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1733575978763,
+      "tag": "0009_round_night_thrasher",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1733578389200,
+      "tag": "0010_rich_iceman",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1733667753830,
+      "tag": "0011_broad_thunderball",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1733768633040,
+      "tag": "0012_outgoing_steel_serpent",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1733773601944,
+      "tag": "0013_productive_deathbird",
+      "breakpoints": true
     }
   ]
 }

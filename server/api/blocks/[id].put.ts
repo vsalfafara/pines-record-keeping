@@ -1,32 +1,32 @@
 import { eq } from "drizzle-orm";
 import { db } from "~/db";
-import { properties } from "~/db/schema";
+import { blocks } from "~/db/schema";
 
 export default defineEventHandler(async (event) => {
   try {
     const id = getRouterParam(event, "id");
     const body = await readBody(event);
-    let property: any = null;
+    let block: any = null;
 
     if (id) {
-      property = await db.query.properties.findFirst({
-        where: eq(properties.id, parseInt(id)),
+      block = await db.query.blocks.findFirst({
+        where: eq(blocks.id, parseInt(id)),
       });
-      if (!property) {
+      if (!block) {
         setResponseStatus(event, 404);
         return {
-          message: "Property not found",
+          message: "Block not found",
         };
       }
 
-      [property] = await db
-        .update(properties)
+      [block] = await db
+        .update(blocks)
         .set({ ...body })
-        .where(eq(properties.id, parseInt(id)))
+        .where(eq(blocks.id, parseInt(id)))
         .returning();
 
       return {
-        message: `Property ${property.name} has been updated`,
+        message: `Property ${block.name} has been updated`,
       };
     } else {
       setResponseStatus(event, 403);

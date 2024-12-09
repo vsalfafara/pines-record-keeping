@@ -15,7 +15,7 @@
           </DialogDescription>
         </DialogHeader>
         <form
-          id="dialogForm"
+          id="editUserForm"
           class="grid grid-cols-2 gap-2"
           @submit="handleSubmit($event, handleUpdateUser)"
         >
@@ -118,7 +118,7 @@
           <DialogClose as-child>
             <Button type="button" variant="outline"> Cancel </Button>
           </DialogClose>
-          <Button type="submit" form="dialogForm" :disabled="loading">
+          <Button type="submit" form="editUserForm" :disabled="loading">
             <LoaderCircle v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
             {{ loading ? "Creating user..." : "Confirm" }}
           </Button>
@@ -180,7 +180,7 @@ let formSchema = toTypedSchema(
     email: z.string().email().default(user.email),
     password: z.string().min(6).optional(),
     role: z.enum(["ADMIN", "ACCOUNTS_CLERK"]).default(user.role),
-  }),
+  })
 );
 
 function handleOpenDialog(state: boolean) {
@@ -193,7 +193,7 @@ function handleOpenDialog(state: boolean) {
         email: z.string().email().default(user.email),
         password: z.string().min(6).optional(),
         role: z.enum(["ADMIN", "ACCOUNTS_CLERK"]).default(user.role),
-      }),
+      })
     );
   }
 }
