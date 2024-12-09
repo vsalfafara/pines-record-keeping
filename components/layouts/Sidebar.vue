@@ -6,7 +6,11 @@
     </div>
     <div v-for="(group, i) in groups" :key="i">
       <p class="text-sm text-muted-foreground">{{ group.name }}</p>
-      <NuxtLink v-for="(route, j) in group.routes" :key="j" :to="route.url">
+      <NuxtLink
+        v-for="(route, j) in group.routes"
+        :key="j"
+        :to="{ name: route.name }"
+      >
         <Button
           variant="ghost"
           class="flex w-full items-center justify-start gap-2 p-2"
@@ -14,7 +18,7 @@
             'bg-accent text-accent-foreground': active === route.name,
           }"
         >
-          <component :is="route.icon" />
+          <component :is="route.meta.icon" />
           <span class="font-semibold">{{ route.name }}</span>
         </Button>
       </NuxtLink>
@@ -50,53 +54,12 @@ import {
 } from "lucide-vue-next";
 import type { RouteRecordNameGeneric } from "vue-router";
 import Button from "../ui/button/Button.vue";
-
-type Route = {
-  name: string;
-  icon: any;
-  url: string;
-};
-
-type Group = {
-  name: string;
-  routes: Route[];
-};
+import { sidebarRoutes } from "~/app/router.options";
 
 const loading = ref<boolean>(false);
 const active = ref<RouteRecordNameGeneric>("");
 const route = useRoute();
-const groups: Group[] = [
-  {
-    name: "Platform",
-    routes: [
-      {
-        name: "Client Records",
-        icon: Users,
-        url: "#",
-      },
-    ],
-  },
-  {
-    name: "Admin",
-    routes: [
-      {
-        name: "Reporting Hub",
-        icon: ChartColumnIncreasing,
-        url: "#",
-      },
-      {
-        name: "Property Portfolio",
-        icon: MapPin,
-        url: "property-portfolio",
-      },
-      {
-        name: "Access Management",
-        icon: UserRoundCog,
-        url: "access-management",
-      },
-    ],
-  },
-];
+const groups = ref(sidebarRoutes);
 
 onMounted(async () => {
   const { name } = useRoute();
