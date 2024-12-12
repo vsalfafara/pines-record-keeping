@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout>
+  <NuxtLayout :breadcrumbs="breadcrumbs">
     <h1 class="mb-2 text-2xl font-semibold">Property Portfolio</h1>
     <p class="mb-4 text-muted-foreground">
       Here's a list of all your property ownings.
@@ -131,10 +131,18 @@ import AddPropertyDialog from "~/components/property-portfolio/AddPropertyDialog
 import DeletePropertyDialog from "~/components/property-portfolio/DeletePropertyDialog.vue";
 import EditPropertyButton from "~/components/property-portfolio/EditPropertyButton.vue";
 import type { Property } from "~/db/schema";
+import type { BreadcrumbType } from "~/lib/types";
 
 useHead({
   title: "Property Porfolio",
 });
+
+const breadcrumbs = ref<BreadcrumbType[]>([
+  {
+    label: "Property Portfolio",
+    routeName: "Property Portfolio",
+  },
+]);
 
 const properties = ref<Property[]>([]);
 const loading = ref<boolean>(false);

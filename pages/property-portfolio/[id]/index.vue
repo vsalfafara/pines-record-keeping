@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout>
+  <NuxtLayout :breadcrumbs="breadcrumbs">
     <h1 class="mb-2 text-2xl font-semibold">{{ property?.name }}</h1>
     <p class="mb-4 text-muted-foreground">
       Below are the details and blocks of this property.
@@ -119,7 +119,7 @@
           <AddBlockDialog
             v-if="property"
             :property-id="property.id"
-            @refresh="getProperty"
+            @refresh="handleGetProperty"
           />
         </div>
       </div>
@@ -212,10 +212,18 @@ import { useToast } from "@/components/ui/toast/use-toast";
 
 import type { Block, Property } from "~/db/schema";
 import EditBlockDialog from "~/components/property-portfolio/block/EditBlockDialog.vue";
+import type { BreadcrumbType } from "~/lib/types";
 
 useHead({
   title: "Property Porfolio",
 });
+
+const breadcrumbs = ref<BreadcrumbType[]>([
+  {
+    label: "Property Portfolio",
+    routeName: "Property Portfolio",
+  },
+]);
 
 const { params } = useRoute();
 const { id } = params;
@@ -279,14 +287,14 @@ const columns = [
       actions.push(
         h(EditBlockDialog, {
           blockData: block,
-          onRefresh: () => getProperty(),
+          onRefresh: () => handleGetProperty(),
         })
       );
 
       actions.push(
         h(DeleteBlockDialog, {
           block,
-          onRefresh: () => getProperty(),
+          onRefresh: () => handleGetProperty(),
         })
       );
       return h(
@@ -333,14 +341,18 @@ const table = useVueTable({
   },
 });
 
-onMounted(async () => getProperty());
+onMounted(async () => handleGetProperty());
 
-async function getProperty() {
+async function handleGetProperty() {
   loading.value = true;
   try {
     const data = await $fetch(`/api/properties/${id}`);
     property.value = data as any;
     blocks.value = property.value?.blocks || [];
+    breadcrumbs.value.push({
+      label: property.value?.name || "",
+      routeName: "#",
+    });
   } catch (error) {
     console.log(error);
   }

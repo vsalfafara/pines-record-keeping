@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
         .where(eq(blocks.id, parseInt(id)))
         .returning();
       return {
-        message: `Property ${block.name} has been deleted`,
+        message: `Block ${block.name} has been deleted`,
       };
     } else {
       setResponseStatus(event, 403);

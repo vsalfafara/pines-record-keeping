@@ -172,13 +172,17 @@ import {
 import { useDateFormat } from "@vueuse/core";
 import { valueUpdater } from "~/lib/utils";
 import type { Block, Lot } from "~/db/schema";
+import EditLotDialog from "./lot/EditLotDialog.vue";
+import DeleteLotDialog from "./lot/DeleteLotDialog.vue";
+import RemarksTooltip from "./lot/RemarksTooltip.vue";
 
 const { blockData } = defineProps<{
-  blockData: Block & { lots: Lot[] };
+  blockData: Block & { lots?: Lot[] };
 }>();
 
 const emit = defineEmits(["refresh"]);
 const { toast } = useToast();
+const toPHP = useCurrencyFormatter();
 const loading = ref<boolean>(false);
 const dialogState = ref<boolean>(false);
 const block = ref<typeof blockData>(blockData);
@@ -229,7 +233,8 @@ const columns = [
         () => ["Price", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("price")),
+    cell: ({ row }) =>
+      h("div", { class: "px-4" }, toPHP.value.format(row.getValue("price"))),
   }),
   columnHelper.accessor("remarks", {
     header: ({ column }) => {
@@ -242,7 +247,12 @@ const columns = [
         () => ["Remarks", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("remarks")),
+    cell: ({ row }) => {
+      const remarks: string = row.getValue("remarks");
+      return h(RemarksTooltip, {
+        remarks,
+      });
+    },
   }),
   columnHelper.accessor("createdBy", {
     header: ({ column }) => {
@@ -280,26 +290,26 @@ const columns = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const block = row.original;
+      const lot = row.original;
 
       const actions = [];
 
-      // actions.push(
-      //   h(EditBlockDialog, { block, onRefresh: () => getProperty() })
-      // );
+      actions.push(
+        h(EditLotDialog, { lot, onRefresh: () => handleGetBlock() })
+      );
 
-      // actions.push(
-      //   h(DeleteBlockDialog, {
-      //     block,
-      //     onRefresh: () => getProperty(),
-      //   })
-      // );
+      actions.push(
+        h(DeleteLotDialog, {
+          lot,
+          onRefresh: () => handleGetBlock(),
+        })
+      );
       return h(
         "div",
         {
           class: "flex items-center gap-2 justify-end",
-        }
-        // actions
+        },
+        actions
       );
     },
   }),
@@ -359,7 +369,7 @@ function generateTypedSchema() {
 async function handleGetBlock() {
   const response: any = await $fetch(`/api/blocks/${block.value.id}`);
   block.value = response.data;
-  lots.value = block.value.lots;
+  lots.value = block.value.lots as Lot[];
   formSchema = generateTypedSchema();
 }
 

@@ -1,32 +1,28 @@
 import { eq } from "drizzle-orm";
 import { db } from "~/db";
-import { blocks } from "~/db/schema";
+import { lots } from "~/db/schema";
 
 export default defineEventHandler(async (event) => {
   try {
     const id = getRouterParam(event, "id");
-    const body = await readBody(event);
-    let block: any = null;
+    let lot: any = null;
 
     if (id) {
-      block = await db.query.blocks.findFirst({
-        where: eq(blocks.id, parseInt(id)),
+      lot = await db.query.lots.findFirst({
+        where: eq(lots.id, parseInt(id)),
       });
-      if (!block) {
+      if (!lot) {
         setResponseStatus(event, 404);
         return {
-          message: "Block not found",
+          message: "Lot not found",
         };
       }
-
-      [block] = await db
-        .update(blocks)
-        .set({ ...body })
-        .where(eq(blocks.id, parseInt(id)))
+      [lot] = await db
+        .delete(lots)
+        .where(eq(lots.id, parseInt(id)))
         .returning();
-
       return {
-        message: `Block ${block.name} has been updated`,
+        message: `Lot ${lot.name} has been deleted`,
       };
     } else {
       setResponseStatus(event, 403);
