@@ -349,10 +349,15 @@ async function handleGetProperty() {
     const data = await $fetch(`/api/properties/${id}`);
     property.value = data as any;
     blocks.value = property.value?.blocks || [];
-    breadcrumbs.value.push({
-      label: property.value?.name || "",
-      routeName: "#",
-    });
+
+    if (breadcrumbs.value.length == 2) {
+      breadcrumbs.value[1].label = property.value?.name || "";
+    } else {
+      breadcrumbs.value.push({
+        label: property.value?.name || "",
+        routeName: "#",
+      });
+    }
   } catch (error) {
     console.log(error);
   }
@@ -369,6 +374,7 @@ async function handleUpdateProperty(values: any) {
         body: { ...values },
       }
     );
+    handleGetProperty();
     toast({
       title: "Success",
       description: response.message,
