@@ -12,9 +12,11 @@ export const sidebarRoutes = [
     routes: [
       {
         name: "Client Records",
+        path: "/client-records",
         meta: {
           icon: Users,
         },
+        component: () => import("~/pages/client-records/index.vue"),
       },
     ],
   },

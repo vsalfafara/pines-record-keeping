@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     "shadcn-nuxt",
     "@nuxtjs/color-mode",
     "@nuxt/image",
+    "@nuxtjs/cloudinary",
     "nuxt-auth-utils",
   ],
   shadcn: {

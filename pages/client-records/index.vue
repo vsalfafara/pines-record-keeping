@@ -1,8 +1,8 @@
 <template>
   <NuxtLayout :breadcrumbs="breadcrumbs">
-    <h1 class="mb-2 text-2xl font-semibold">Access Management</h1>
+    <h1 class="mb-2 text-2xl font-semibold">Client Records</h1>
     <p class="mb-4 text-muted-foreground">
-      Here's a list of all your admin access.
+      Here's a list of all your client records.
     </p>
     <div class="grid grid-cols-1 gap-2">
       <div
@@ -35,7 +35,7 @@
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <AddUserDialog @refresh="getUsers" />
+          <AddClientDialog @refresh="handleGetClients" />
         </div>
       </div>
       <div class="rounded-md border">
@@ -94,9 +94,23 @@
 
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import type {
   ColumnFiltersState,
-  ExpandedState,
   SortingState,
   VisibilityState,
 } from "@tanstack/vue-table";
@@ -113,37 +127,25 @@ import {
 import { Settings2, ArrowUpDown, LoaderCircle } from "lucide-vue-next";
 import { valueUpdater } from "~/lib/utils";
 import { useDateFormat } from "@vueuse/core";
-import AddUserDialog from "~/components/access-management/AddUserDialog.vue";
-import EditUserDialog from "~/components/access-management/EditUserDialog.vue";
-import DeleteUserDialog from "~/components/access-management/DeleteUserDialog.vue";
+import AddClientDialog from "~/components/client-records/AddClientDialog.vue";
+import type { Client } from "~/db/schema";
 import type { BreadcrumbType } from "~/lib/types";
 
 useHead({
-  title: "Access Management",
+  title: "Property Porfolio",
 });
 
 const breadcrumbs = ref<BreadcrumbType[]>([
   {
-    label: "Access Management",
-    routeName: "Access Management",
+    label: "Client Records",
+    routeName: "Client Records",
   },
 ]);
 
-export type User = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: "ADMIN" | "ACCOUNTS_CLERK";
-  createdBy: string;
-  createdAt: string;
-};
-
-const { user: userSession } = useUserSession();
-const users = ref<User[]>([]);
+const properties = ref<Client[]>([]);
 const loading = ref<boolean>(false);
 
-const columnHelper = createColumnHelper<User>();
+const columnHelper = createColumnHelper<Client>();
 
 const columns = [
   columnHelper.accessor("firstName", {
@@ -154,7 +156,7 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["First Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("firstName")),
@@ -167,35 +169,10 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Last Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("lastName")),
-  }),
-  columnHelper.accessor("role", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Role", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => {
-      let role: any = row.getValue("role");
-
-      role = role
-        .split("_")
-        .map(
-          (word: string) => word[0].toUpperCase() + word.slice(1).toLowerCase()
-        )
-        .join(" ")
-        .trim();
-
-      return h("div", { class: "px-4" }, role);
-    },
   }),
   columnHelper.accessor("email", {
     header: ({ column }) => {
@@ -205,10 +182,24 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Email Address", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Full Address", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("email")),
+  }),
+  columnHelper.accessor("mobileNumber", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Full Address", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) =>
+      h("div", { class: "px-4" }, row.getValue("mobileNumber")),
   }),
   columnHelper.accessor("createdBy", {
     header: ({ column }) => {
@@ -246,26 +237,24 @@ const columns = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original;
+      // const client = row.original;
 
-      const actions = [];
+      // const actions = [];
 
-      actions.push(h(EditUserDialog, { user, onRefresh: () => getUsers() }));
+      // actions.push(h(EditPropertyButton, { property }));
 
-      if (userSession.value?.id !== user.id) {
-        actions.push(
-          h(DeleteUserDialog, {
-            user,
-            onRefresh: () => getUsers(),
-          })
-        );
-      }
+      // actions.push(
+      //   h(DeletePropertyDialog, {
+      //     property,
+      //     onRefresh: () => handleGetClients(),
+      //   })
+      // );
       return h(
         "div",
         {
           class: "flex items-center gap-2 justify-end",
-        },
-        actions
+        }
+        // actions
       );
     },
   }),
@@ -276,7 +265,7 @@ const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
 
 const table = useVueTable({
-  data: users,
+  data: properties,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -304,18 +293,16 @@ const table = useVueTable({
   },
 });
 
-onMounted(async () => getUsers());
+onMounted(async () => handleGetClients());
 
-async function getUsers() {
+async function handleGetClients() {
   loading.value = true;
   try {
-    const data = await $fetch("/api/users/all");
-    users.value = data as any;
+    const data = await $fetch(`/api/clients/all`);
+    properties.value = data as any;
   } catch (error) {
     console.log(error);
   }
   loading.value = false;
 }
 </script>
-
-<style scoped></style>

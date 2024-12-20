@@ -60,6 +60,19 @@ export const lots = schema.table("lots", {
   createdAt: t.date("created_at", { mode: "date" }).defaultNow(),
 });
 
+export const clients = schema.table("clients", {
+  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  firstName: t.varchar("first_name").notNull(),
+  lastName: t.varchar("last_name").notNull(),
+  birthDate: t.date("birth_date", { mode: "string" }).notNull(),
+  email: t.varchar("email").notNull(),
+  fullAddress: t.varchar("full_address").notNull(),
+  mobileNumber: t.varchar("mobile_number").notNull(),
+  landlineNumber: t.varchar("landline_number").notNull(),
+  createdBy: t.varchar("created_by").notNull(),
+  createdAt: t.date("created_at", { mode: "date" }).defaultNow(),
+});
+
 export const propertyRelations = relations(properties, ({ many }) => ({
   blocks: many(blocks),
 }));
@@ -94,3 +107,6 @@ export type NewBlock = InferInsertModel<typeof blocks>;
 
 export type Lot = InferSelectModel<typeof lots>;
 export type NewLot = InferInsertModel<typeof lots>;
+
+export type Client = InferSelectModel<typeof clients>;
+export type NewClient = InferInsertModel<typeof clients>;

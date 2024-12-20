@@ -35,7 +35,7 @@
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <AddPropertyDialog @refresh="getProperties" />
+          <AddPropertyDialog @refresh="handleGetProperties" />
         </div>
       </div>
       <div class="rounded-md border">
@@ -274,7 +274,7 @@ const columns = [
       actions.push(
         h(DeletePropertyDialog, {
           property,
-          onRefresh: () => getProperties(),
+          onRefresh: () => handleGetProperties(),
         })
       );
       return h(
@@ -321,9 +321,9 @@ const table = useVueTable({
   },
 });
 
-onMounted(async () => getProperties());
+onMounted(async () => handleGetProperties());
 
-async function getProperties() {
+async function handleGetProperties() {
   loading.value = true;
   try {
     const data = await $fetch(`/api/properties/all`);
