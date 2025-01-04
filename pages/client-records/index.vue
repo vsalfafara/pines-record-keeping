@@ -128,6 +128,7 @@ import { Settings2, ArrowUpDown, LoaderCircle } from "lucide-vue-next";
 import { valueUpdater } from "~/lib/utils";
 import { useDateFormat } from "@vueuse/core";
 import AddClientDialog from "~/components/client-records/AddClientDialog.vue";
+import EditClientButton from "~/components/client-records/EditClientButton.vue";
 import type { Client } from "~/db/schema";
 import type { BreadcrumbType } from "~/lib/types";
 
@@ -156,7 +157,7 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["First Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("firstName")),
@@ -169,7 +170,7 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Last Name", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("lastName")),
@@ -237,11 +238,11 @@ const columns = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      // const client = row.original;
+      const client = row.original;
 
-      // const actions = [];
+      const actions = [];
 
-      // actions.push(h(EditPropertyButton, { property }));
+      actions.push(h(EditClientButton, { client }));
 
       // actions.push(
       //   h(DeletePropertyDialog, {
@@ -253,8 +254,8 @@ const columns = [
         "div",
         {
           class: "flex items-center gap-2 justify-end",
-        }
-        // actions
+        },
+        actions
       );
     },
   }),

@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
       .values({ ...body })
       .returning();
     return {
-      message: `Lot ${client.firstName} ${client.lastName} has been created`,
+      client,
     };
   } catch (error) {
     console.log(error);

@@ -53,11 +53,13 @@ export default {
     },
     ...sidebarRoutes.map((routes) => routes.routes).flat(),
     {
+      name: "Client",
+      path: "/client-records/:id",
+      component: () => import("~/pages/client-records/[id]/index.vue"),
+    },
+    {
       name: "Property",
       path: "/property-portfolio/:id",
-      meta: {
-        icon: UserRoundCog,
-      },
       component: () => import("~/pages/property-portfolio/[id]/index.vue"),
     },
     {

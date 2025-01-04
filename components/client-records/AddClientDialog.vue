@@ -303,7 +303,7 @@
                     v-bind="componentField"
                     placeholder="Select Date"
                     :formatter="{
-                      date: ' MM-DD-YYYY',
+                      date: 'MM-DD-YYYY',
                       month: 'MMMM',
                     }"
                     as-single
@@ -496,30 +496,61 @@ async function handleGetLots(blockId: number) {
   lots.value = block?.lots || [];
 }
 
+function getClientInfo(values: any) {
+  const {
+    propertyId,
+    blockId,
+    lotId,
+    paymentType,
+    reservation,
+    lotPrice,
+    modeOfPayment,
+    dateOfPayment,
+    receipt,
+    ...client
+  } = values;
+  return client;
+}
+
+function getLotInfo(values: any) {
+  const {
+    firstName,
+    lastName,
+    fullAddress,
+    birthDate,
+    email,
+    mobileNumber,
+    landlineNumber,
+    ...lot
+  } = values;
+
+  return lot;
+}
+
 async function handleCreateClient(values: any) {
+  console.log(getClientInfo(values));
+  console.log(getLotInfo(values));
   loading.value = true;
   try {
     values.birthDate = new Date(values.birthDate[0]).toISOString();
     values.dateOfPayment = values.dateOfPayment[0];
     const { user } = useUserSession();
     const sessionData = { id: null, ...user.value };
-    const {
-      propertyId,
-      blockId,
-      lotId,
-      paymentType,
-      reservation,
-      lotPrice,
-      modeOfPayment,
-      dateOfPayment,
-      receipt,
-      ...client
-    } = values;
-    const body = {
-      ...client,
+    let body = {
+      ...getClientInfo(values),
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
     };
-    const response: any = await $fetch("/api/clients/create", {
+    let response: any = await $fetch("/api/clients/create", {
+      method: "POST",
+      body,
+    });
+    body = {
+      ...getLotInfo(values),
+      clientId: response.client.id,
+      createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
+    };
+    console.log(body);
+    response = await $fetch("/api/client-lots/create", {
       method: "POST",
       body,
     });
