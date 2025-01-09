@@ -125,7 +125,7 @@
                     <FormControl>
                       <Input
                         type="text"
-                        :default-value="client.landlineNumber"
+                        :default-value="client.landlineNumber || undefined"
                         v-bind="componentField"
                       />
                     </FormControl>
@@ -197,11 +197,11 @@
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <!-- <AddBlockDialog
-            v-if="property"
-            :property-id="property.id"
+          <AddClientLotDialog
+            v-if="client"
+            :client-id="client.id"
             @refresh="handleGetClient"
-          /> -->
+          />
         </div>
       </div>
       <div class="rounded-md border">
@@ -288,6 +288,8 @@ import {
 import { valueUpdater } from "~/lib/utils";
 import { useDateFormat } from "@vueuse/core";
 import { useToast } from "@/components/ui/toast/use-toast";
+import AddClientLotDialog from "@/components/client-records/client-lot/AddClientLotDialog.vue";
+import EditClientLotDialog from "@/components/client-records/client-lot/EditClientLotDialog.vue";
 
 import type { Client, ClientLot } from "~/db/schema";
 import type { BreadcrumbType } from "~/lib/types";
@@ -488,6 +490,13 @@ const columns = [
 
       const actions = [];
 
+      actions.push(
+        h(EditClientLotDialog, {
+          clientLotData: clientLot,
+          onRefresh: () => {},
+        })
+      );
+
       // actions.push(
       //   h(EditBlockDialog, {
       //     blockData: block,
@@ -499,8 +508,8 @@ const columns = [
         "div",
         {
           class: "flex items-center gap-2 justify-end",
-        }
-        // actions
+        },
+        actions
       );
     },
   }),
@@ -547,7 +556,6 @@ async function handleGetClient() {
     const data = await $fetch(`/api/clients/${id}`);
     client.value = data as any;
     clientLots.value = client.value?.clientLots || [];
-    console.log(clientLots.value);
 
     if (breadcrumbs.value.length == 2) {
       breadcrumbs.value[1].label =

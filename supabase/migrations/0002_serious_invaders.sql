@@ -1,1 +1,0 @@
-ALTER TABLE "pines-dev"."properties" ADD COLUMN "full_address" varchar;

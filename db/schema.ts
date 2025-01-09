@@ -18,6 +18,14 @@ export const lotTypes = t.pgEnum("lot_type", [
   "Roadside",
 ]);
 
+export const invoicePurposes = t.pgEnum("purpose", [
+  "Payment Plan",
+  "Interment",
+  "Perpetual Care",
+]);
+
+export const inNeed = t.pgEnum("in_need", ["Yes", "No"]);
+
 export const users = schema.table("users", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   firstName: t.varchar("first_name").notNull(),
@@ -57,6 +65,7 @@ export const lots = schema.table("lots", {
   lotType: lotTypes().notNull(),
   price: t.decimal().notNull(),
   remarks: t.varchar(),
+  taken: t.boolean().default(false),
   createdBy: t.varchar("created_by").notNull(),
   createdAt: t.date("created_at", { mode: "date" }).defaultNow().notNull(),
 });
@@ -69,7 +78,7 @@ export const clients = schema.table("clients", {
   email: t.varchar("email").notNull(),
   fullAddress: t.varchar("full_address").notNull(),
   mobileNumber: t.varchar("mobile_number").notNull(),
-  landlineNumber: t.varchar("landline_number").notNull(),
+  landlineNumber: t.varchar("landline_number"),
   createdBy: t.varchar("created_by").notNull(),
   createdAt: t.date("created_at", { mode: "date" }).defaultNow().notNull(),
 });
@@ -80,11 +89,11 @@ export const clientLots = schema.table("client_lots", {
   propertyId: t.integer("property_id").notNull(),
   blockId: t.integer("block_id").notNull(),
   lotId: t.integer("lot_id").notNull(),
-  reservation: t.integer("reservation").notNull(),
+  reservation: t.integer("reservation"),
   paymentType: t.varchar("payment_type"),
   paymentPlan: t.varchar("payment_plan"),
-  inNeed: t.boolean("in_need").default(false),
-  terms: t.varchar("terms"),
+  inNeed: inNeed("in_need"),
+  terms: t.integer("terms"),
   downpayment: t.varchar("downpayment"),
   discount: t.integer("discount"),
   monthsToPay: t.integer("months_to_pay"),
@@ -93,6 +102,27 @@ export const clientLots = schema.table("client_lots", {
   actualPrice: t.integer("actual_price"),
   balance: t.integer("balance"),
   agent: t.varchar("agent"),
+  createdBy: t.varchar("created_by"),
+  createdAt: t.date("created_at", { mode: "date" }).defaultNow().notNull(),
+});
+
+export const perpetualCares = schema.table("perpetual_cares", {
+  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  clientLotId: t.integer("client_lot_id").notNull(),
+  installmentMonths: t.integer("installment_months").notNull(),
+  dueDate: t.date("due_date", { mode: "string" }).notNull(),
+  paymentDue: t.varchar("payment_due").notNull(),
+  paid: t.integer("paid").notNull(),
+  remainingBalance: t.integer("remaining_balance").notNull(),
+});
+
+export const invoices = schema.table("invoices", {
+  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  clientLotId: t.integer("client_lot_id").notNull(),
+  purpose: invoicePurposes().notNull(),
+  payment: t.integer().notNull(),
+  dateOfPayment: t.date("date_of_payment", { mode: "string" }).notNull(),
+  remarks: t.varchar("remarks"),
   createdBy: t.varchar("created_by"),
   createdAt: t.date("created_at", { mode: "date" }).defaultNow().notNull(),
 });
@@ -120,7 +150,7 @@ export const clientRelations = relations(clients, ({ many }) => ({
   clientLots: many(clientLots),
 }));
 
-export const clientLotsRelations = relations(clientLots, ({ one }) => ({
+export const clientLotsRelations = relations(clientLots, ({ one, many }) => ({
   property: one(properties, {
     fields: [clientLots.propertyId],
     references: [properties.id],
@@ -136,6 +166,22 @@ export const clientLotsRelations = relations(clientLots, ({ one }) => ({
   client: one(clients, {
     fields: [clientLots.clientId],
     references: [clients.id],
+  }),
+  invoices: many(invoices),
+  perpetualCare: many(perpetualCares),
+}));
+
+export const invoicesRelations = relations(invoices, ({ one }) => ({
+  clientLot: one(clientLots, {
+    fields: [invoices.clientLotId],
+    references: [clientLots.id],
+  }),
+}));
+
+export const perpetualCaresRelations = relations(perpetualCares, ({ one }) => ({
+  clientLot: one(clientLots, {
+    fields: [perpetualCares.clientLotId],
+    references: [clientLots.id],
   }),
 }));
 
@@ -166,3 +212,9 @@ export type ClientLot = InferSelectModel<typeof clientLots> & {
   lot: Lot;
 };
 export type NewClientLot = InferInsertModel<typeof clientLots>;
+
+export type Invoice = InferSelectModel<typeof invoices>;
+export type NewInvoice = InferInsertModel<typeof invoices>;
+
+export type PerpetualCare = InferSelectModel<typeof perpetualCares>;
+export type NewPerpetualCare = InferInsertModel<typeof perpetualCares>;

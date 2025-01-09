@@ -1,0 +1,1 @@
+ALTER TABLE "pines-dev"."client_lots" ADD COLUMN "terms" integer;

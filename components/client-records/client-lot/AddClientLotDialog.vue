@@ -6,7 +6,7 @@
   >
     <Dialog :open="dialogState" @update:open="(state) => (dialogState = state)">
       <DialogTrigger as-child>
-        <Button> <Plus /> Add Client </Button>
+        <Button> <Plus /> Add Lot </Button>
       </DialogTrigger>
       <DialogScrollContent class="sm:max-w-[620px]">
         <DialogHeader>
@@ -14,9 +14,7 @@
             ><Plus class="h-8 w-8 rounded-md bg-blue-50 p-2 text-blue-600"
           /></DialogTitle>
           <DialogDescription>
-            <h3 class="mb-2 text-xl font-semibold text-slate-900">
-              Add Client
-            </h3>
+            <h3 class="mb-2 text-xl font-semibold text-slate-900">Add Lot</h3>
             <p>Fill out the form</p>
           </DialogDescription>
         </DialogHeader>
@@ -25,108 +23,6 @@
           class="grid grid-cols-2 gap-2"
           @submit="handleSubmit($event, handleCreateClient)"
         >
-          <p class="col-span-2 font-semibold text-blue-600">
-            Client Information
-          </p>
-          <FormField v-slot="{ componentField }" name="firstName">
-            <FormItem>
-              <FormLabel>First Name *</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  placeholder="Input first name"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <FormField v-slot="{ componentField }" name="lastName">
-            <FormItem>
-              <FormLabel>Last Name *</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  placeholder="Input last name"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <FormField v-slot="{ componentField }" name="fullAddress">
-            <FormItem class="col-span-2">
-              <FormLabel>Full Address *</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Input full address (unit/lot no, barangay, city, country)"
-                  class="col-span-2"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <FormField v-slot="{ componentField }" name="birthDate">
-            <FormItem>
-              <FormLabel>Birth Date *</FormLabel>
-              <FormControl>
-                <VueTailwindDatepicker
-                  v-bind="componentField"
-                  placeholder="Select Date"
-                  :formatter="{
-                    date: 'YYYY-MM-DD',
-                    month: 'MMMM',
-                  }"
-                  as-single
-                  overlay
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <FormField v-slot="{ componentField }" name="email">
-            <FormItem>
-              <FormLabel>Email *</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  placeholder="sample@gmail.com"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <FormField v-slot="{ componentField }" name="mobileNumber">
-            <FormItem>
-              <FormLabel>Mobile Number *</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  placeholder="+63 000 000 0000"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <FormField v-slot="{ componentField }" name="landlineNumber">
-            <FormItem>
-              <FormLabel>Landline Number</FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  placeholder="272 000 0000"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <p class="col-span-2 font-semibold text-blue-600">
-            Property Information
-          </p>
           <FormField v-slot="{ componentField }" name="propertyId">
             <FormItem class="col-span-2">
               <FormLabel>Property Name *</FormLabel>
@@ -583,7 +479,9 @@ import * as z from "zod";
 import { useToast } from "@/components/ui/toast/use-toast";
 import type { Block, Lot, Property } from "~/db/schema";
 import { CloudUpload } from "lucide-vue-next";
-import { useFileDialog, type AnyFn } from "@vueuse/core";
+import { useFileDialog } from "@vueuse/core";
+
+const { clientId } = defineProps<{ clientId: number }>();
 
 const { open, onChange } = useFileDialog({
   accept: "image/*",
@@ -618,15 +516,6 @@ const modeOfPayment = ref<string[]>([
 const formSchema = toTypedSchema(
   z
     .object({
-      firstName: z.string().min(1, { message: "Please enter a first name" }),
-      lastName: z.string().min(1, { message: "Please enter a last name" }),
-      fullAddress: z.string().min(1, { message: "Please enter an address" }),
-      birthDate: z.array(z.string(), { message: "Please enter a birth date" }),
-      email: z.string().min(1, { message: "Please enter an email address" }),
-      mobileNumber: z
-        .string()
-        .min(1, { message: "Please enter a mobile number" }),
-      landlineNumber: z.string().optional(),
       propertyId: z.string().min(1, { message: "Please select a property" }),
       blockId: z.string().min(1, { message: "Please select a block" }),
       lotId: z.string().min(1, { message: "Please select a lot" }),
@@ -771,33 +660,22 @@ function getLotInfo(values: any) {
 async function handleCreateClient(values: any) {
   loading.value = true;
   try {
-    values.birthDate = new Date(values.birthDate[0]).toISOString();
     values.dateOfPayment = values.dateOfPayment[0];
     const { user } = useUserSession();
     const sessionData = { id: null, ...user.value };
-    let body = {
-      ...getClientInfo(values),
-      createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
-    };
-    let response: any = await $fetch("/api/clients/create", {
-      method: "POST",
-      body,
-    });
-    body = {
+    const body = {
       ...getLotInfo(values),
-      clientId: response.client.id,
+      clientId: clientId,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
     };
-    response = await $fetch("/api/client-lots/create", {
+    const response: any = await $fetch("/api/client-lots/create", {
       method: "POST",
       body,
     });
-
     await $fetch(`/api/lots/${body.lotId}`, {
       method: "PUT",
       body: { taken: true },
     });
-    handleGetProperties();
     toast({
       title: "Success",
       description: response.message,
@@ -806,7 +684,7 @@ async function handleCreateClient(values: any) {
     emit("refresh");
     dialogState.value = false;
   } catch (error: any) {
-    console.log(error.response);
+    console.log(error);
     toast({
       title: "Error",
       description: "Something went wrong.",

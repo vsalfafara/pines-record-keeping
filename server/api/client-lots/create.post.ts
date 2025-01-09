@@ -1,5 +1,6 @@
+import { eq } from "drizzle-orm";
 import { db } from "~/db";
-import { clientLots } from "~/db/schema";
+import { clientLots, lots } from "~/db/schema";
 import type { NewClientLot } from "~/db/schema";
 
 export default defineEventHandler(async (event) => {
@@ -9,8 +10,12 @@ export default defineEventHandler(async (event) => {
       .insert(clientLots)
       .values({ ...body })
       .returning();
+    const lot = await db.query.lots.findFirst({
+      where: eq(lots.id, clientLot.lotId),
+    });
+
     return {
-      message: `Lot No. ${clientLot.lotId} has been assigned to the client`,
+      message: `${lot?.name} has been assigned to the client`,
     };
   } catch (error) {
     console.log(error);

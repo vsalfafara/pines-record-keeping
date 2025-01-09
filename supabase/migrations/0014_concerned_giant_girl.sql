@@ -1,1 +1,0 @@
-ALTER TABLE "pines-dev"."clients" ALTER COLUMN "created_at" DROP NOT NULL;

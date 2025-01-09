@@ -1,1 +1,0 @@
-ALTER TABLE "pines-dev"."client_lots" ADD COLUMN "client_id" integer NOT NULL;

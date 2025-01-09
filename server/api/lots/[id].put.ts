@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
       [lot] = await db
         .update(lots)
-        .set({ ...body })
+        .set(body)
         .where(eq(lots.id, parseInt(id)))
         .returning();
 
