@@ -85,7 +85,6 @@
                           month: 'MMMM',
                         }"
                         as-single
-                        overlay
                       />
                     </FormControl>
                     <FormMessage />
@@ -275,7 +274,6 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import {
   Settings2,
@@ -288,6 +286,7 @@ import {
 import { valueUpdater } from "~/lib/utils";
 import { useDateFormat } from "@vueuse/core";
 import { useToast } from "@/components/ui/toast/use-toast";
+import { toTypedSchema } from "@vee-validate/zod";
 import AddClientLotDialog from "@/components/client-records/client-lot/AddClientLotDialog.vue";
 import EditClientLotDialog from "@/components/client-records/client-lot/EditClientLotDialog.vue";
 

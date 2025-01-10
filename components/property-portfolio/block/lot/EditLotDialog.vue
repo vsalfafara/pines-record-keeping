@@ -164,7 +164,7 @@ async function handleUpdateLot(values: any) {
   loading.value = true;
   try {
     const response: any = await $fetch(`/api/lots/${lot.id}`, {
-      method: "put",
+      method: "PUT",
       body: values,
     });
     toast({

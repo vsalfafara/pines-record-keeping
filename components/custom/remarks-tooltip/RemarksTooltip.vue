@@ -13,5 +13,5 @@
 </template>
 
 <script setup lang="ts">
-const { remarks } = defineProps<{ remarks: string }>();
+const { remarks } = defineProps<{ remarks: string | null }>();
 </script>

@@ -1,0 +1,1 @@
+ALTER TABLE "pines-dev"."invoices" ADD COLUMN "receipt" varchar NOT NULL;

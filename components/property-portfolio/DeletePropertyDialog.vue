@@ -66,7 +66,7 @@ async function handleDeleteUser() {
   loading.value = true;
   try {
     const response: any = await $fetch(`/api/properties/${property.id}`, {
-      method: "delete",
+      method: "DELETE",
     });
     toast({
       title: "Success",

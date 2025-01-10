@@ -13,7 +13,8 @@
             <div class="flex gap-2">
               <h3 class="mb-2 text-xl font-semibold text-slate-900">
                 {{ clientLotData.property.name }} |
-                {{ clientLotData.block.name }} | {{ clientLotData.lot.name }}
+                {{ clientLotData.block.name }} |
+                {{ clientLotData.lot.name }}
               </h3>
             </div>
           </SheetDescription>
@@ -51,7 +52,7 @@
             <Input
               type="text"
               class="mt-1"
-              :default-value="clientLotData.reservation || undefined"
+              :default-value="toPHP.format(clientLotData.reservation || 0)"
               disabled
             />
           </div>
@@ -105,7 +106,7 @@
             <Input
               type="text"
               class="mt-1"
-              :default-value="clientLotData.discount || undefined"
+              :default-value="toPHP.format(clientLotData.discount || 0)"
               disabled
             />
           </div>
@@ -123,7 +124,7 @@
             <Input
               type="text"
               class="mt-1"
-              :default-value="clientLotData.monthly || undefined"
+              :default-value="toPHP.format(clientLotData.monthly || 0)"
               disabled
             />
           </div>
@@ -132,7 +133,7 @@
             <Input
               type="text"
               class="mt-1"
-              :default-value="clientLotData.totalInterest || undefined"
+              :default-value="toPHP.format(clientLotData.totalInterest || 0)"
               disabled
             />
           </div>
@@ -141,7 +142,9 @@
             <Input
               type="text"
               class="mt-1"
-              :default-value="clientLotData.lot.price"
+              :default-value="
+                toPHP.format(parseInt(clientLotData.lot.price) || 0)
+              "
               disabled
             />
           </div>
@@ -150,7 +153,7 @@
             <Input
               type="text"
               class="mt-1"
-              :default-value="clientLotData.actualPrice || undefined"
+              :default-value="toPHP.format(clientLotData.actualPrice || 0)"
               disabled
             />
           </div>
@@ -187,23 +190,22 @@
         <Tabs default-value="account" @update:model-value="handleChangeTab">
           <div class="flex justify-between">
             <TabsList>
-              <TabsTrigger value="payment-plan"> Payment Plan </TabsTrigger>
+              <!-- <TabsTrigger value="payment-plan"> Payment Plan </TabsTrigger> -->
               <TabsTrigger value="interment"> Interment </TabsTrigger>
               <TabsTrigger value="perpetual-care"> Perpetual Care </TabsTrigger>
               <TabsTrigger value="invoices"> Invoices </TabsTrigger>
               <TabsTrigger value="expenses"> Expenses </TabsTrigger>
             </TabsList>
-            <div class="flex gap-2">
-              <Button v-if="tab === 'invoices'"> <Plus /> Add Invoice </Button>
-            </div>
           </div>
-          <TabsContent value="payment-plan"> <p>No content yet</p></TabsContent>
-          <TabsContent value="interment"> </TabsContent>
+          <!-- <TabsContent value="payment-plan"> <p>No content yet</p></TabsContent> -->
+          <TabsContent value="interment">
+            <Interments :client-lot="clientLotData"
+          /></TabsContent>
           <TabsContent value="perpetual-care">
             <p>No content yet</p>
           </TabsContent>
           <TabsContent value="invoices">
-            <p>No content yet</p>
+            <Invoices :client-lot="clientLotData" />
           </TabsContent>
           <TabsContent value="expenses">
             <p>No content yet</p>
@@ -225,22 +227,10 @@ import { Pencil, Plus } from "lucide-vue-next";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import { useToast } from "@/components/ui/toast/use-toast";
-import {
-  createColumnHelper,
-  FlexRender,
-  getCoreRowModel,
-  getExpandedRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useVueTable,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
-} from "@tanstack/vue-table";
 import { useDateFormat } from "@vueuse/core";
-import { valueUpdater } from "~/lib/utils";
-import type { ClientLot } from "~/db/schema";
+import Interments from "./Interments.vue";
+import Invoices from "./Invoices.vue";
+import type { ClientLot, Invoice } from "~/db/schema";
 
 const { clientLotData } = defineProps<{
   clientLotData: ClientLot;
@@ -258,14 +248,10 @@ const { toast } = useToast();
 const toPHP = useCurrencyFormatter();
 const loading = ref<boolean>(false);
 const dialogState = ref<boolean>(false);
-const clientLot = ref<typeof clientLotData>(clientLotData);
+const invoices = ref<Invoice[]>([]);
 const tab = ref<Tab | string | number>("payment-plan");
 
 let formSchema = generateTypedSchema();
-
-onMounted(() => {
-  handleGetClientLot();
-});
 
 function handleOpenDialog(state: boolean) {
   dialogState.value = state;
@@ -285,13 +271,6 @@ function generateTypedSchema() {
 
 function handleChangeTab(tabName: Tab | string | number) {
   tab.value = tabName;
-}
-
-async function handleGetClientLot() {
-  // const response: any = await $fetch(`/api/blocks/${block.value.id}`);
-  // block.value = response.data;
-  // lots.value = block.value.lots as Lot[];
-  // formSchema = generateTypedSchema();
 }
 
 async function handleUpdateClientLot(values: any) {

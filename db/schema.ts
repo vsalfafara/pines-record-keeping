@@ -19,12 +19,17 @@ export const lotTypes = t.pgEnum("lot_type", [
 ]);
 
 export const invoicePurposes = t.pgEnum("purpose", [
+  "Full Payment",
+  "Downpayment",
   "Payment Plan",
   "Interment",
   "Perpetual Care",
+  "Reservation",
 ]);
 
 export const inNeed = t.pgEnum("in_need", ["Yes", "No"]);
+
+export const intermentTypes = t.pgEnum("type", ["Flesh", "Bone"]);
 
 export const users = schema.table("users", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -95,6 +100,7 @@ export const clientLots = schema.table("client_lots", {
   inNeed: inNeed("in_need"),
   terms: t.integer("terms"),
   downpayment: t.varchar("downpayment"),
+  perpetualCarePrice: t.integer("perpetual_care_price"),
   discount: t.integer("discount"),
   monthsToPay: t.integer("months_to_pay"),
   monthly: t.integer("monthly"),
@@ -106,13 +112,31 @@ export const clientLots = schema.table("client_lots", {
   createdAt: t.date("created_at", { mode: "date" }).defaultNow().notNull(),
 });
 
+export const interments = schema.table("interments", {
+  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  clientLotId: t.integer("client_lot_id").notNull(),
+  dig: t.integer("dig"),
+  type: intermentTypes(),
+  deceasedName: t.varchar("deceased_name"),
+  deceasedBorn: t.date("deceased_born", { mode: "string" }),
+  deceasedDied: t.date("deceased_died", { mode: "string" }),
+  remainsName: t.varchar("remains_name"),
+  remainsBorn: t.date("remains_born", { mode: "string" }),
+  remainsDied: t.date("remains_died", { mode: "string" }),
+  intermentDate: t.date("interment_date", { mode: "string" }),
+  contractorName: t.varchar("contractor_name"),
+  contractorMobileNumber: t.varchar("contractor_mobile_number"),
+  lastModifiedBy: t.varchar("created_by"),
+  lastModifiedAt: t.date("created_at", { mode: "date" }).defaultNow().notNull(),
+});
+
 export const perpetualCares = schema.table("perpetual_cares", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   clientLotId: t.integer("client_lot_id").notNull(),
   installmentMonths: t.integer("installment_months").notNull(),
   dueDate: t.date("due_date", { mode: "string" }).notNull(),
   paymentDue: t.varchar("payment_due").notNull(),
-  paid: t.integer("paid").notNull(),
+  paid: t.doublePrecision("paid").notNull(),
   remainingBalance: t.integer("remaining_balance").notNull(),
 });
 
@@ -122,6 +146,7 @@ export const invoices = schema.table("invoices", {
   purpose: invoicePurposes().notNull(),
   payment: t.integer().notNull(),
   dateOfPayment: t.date("date_of_payment", { mode: "string" }).notNull(),
+  receipt: t.varchar("receipt").notNull(),
   remarks: t.varchar("remarks"),
   createdBy: t.varchar("created_by"),
   createdAt: t.date("created_at", { mode: "date" }).defaultNow().notNull(),
@@ -168,12 +193,20 @@ export const clientLotsRelations = relations(clientLots, ({ one, many }) => ({
     references: [clients.id],
   }),
   invoices: many(invoices),
+  interments: many(interments),
   perpetualCare: many(perpetualCares),
 }));
 
 export const invoicesRelations = relations(invoices, ({ one }) => ({
   clientLot: one(clientLots, {
     fields: [invoices.clientLotId],
+    references: [clientLots.id],
+  }),
+}));
+
+export const intermentsRelations = relations(interments, ({ one }) => ({
+  clientLot: one(clientLots, {
+    fields: [interments.clientLotId],
     references: [clientLots.id],
   }),
 }));
@@ -218,3 +251,6 @@ export type NewInvoice = InferInsertModel<typeof invoices>;
 
 export type PerpetualCare = InferSelectModel<typeof perpetualCares>;
 export type NewPerpetualCare = InferInsertModel<typeof perpetualCares>;
+
+export type Interment = InferSelectModel<typeof interments>;
+export type NewInterment = InferInsertModel<typeof interments>;

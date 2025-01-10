@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       message: `${lot?.name} has been assigned to the client`,
+      clientLot,
     };
   } catch (error) {
     console.log(error);

@@ -1,14 +1,24 @@
 <template>
   <Form
-    v-slot="{ handleSubmit, values, setFieldValue }"
+    v-slot="{ handleSubmit, values, setFieldValue, resetForm }"
     as=""
     :validation-schema="formSchema"
+    :initial-values="{}"
   >
-    <Dialog :open="dialogState" @update:open="(state) => (dialogState = state)">
+    <Dialog
+      :open="dialogState"
+      @update:open="
+        (state) => {
+          dialogState = state;
+          resetForm();
+          handleGetProperties();
+        }
+      "
+    >
       <DialogTrigger as-child>
         <Button> <Plus /> Add Client </Button>
       </DialogTrigger>
-      <DialogScrollContent class="sm:max-w-[620px]">
+      <DialogScrollContent>
         <DialogHeader>
           <DialogTitle
             ><Plus class="h-8 w-8 rounded-md bg-blue-50 p-2 text-blue-600"
@@ -79,7 +89,6 @@
                     month: 'MMMM',
                   }"
                   as-single
-                  overlay
                 />
               </FormControl>
               <FormMessage />
@@ -133,7 +142,11 @@
               <Select
                 v-bind="componentField"
                 @update:model-value="
-                  (value) => handleGetBlocks(parseInt(value))
+                  (value) => {
+                    if (values.blockId) setFieldValue('blockId', undefined);
+                    if (values.lotId) setFieldValue('lotId', undefined);
+                    handleGetBlocks(parseInt(value));
+                  }
                 "
               >
                 <FormControl>
@@ -161,12 +174,21 @@
               <FormLabel>Block *</FormLabel>
               <Select
                 v-bind="componentField"
-                @update:model-value="(value) => handleGetLots(parseInt(value))"
+                @update:model-value="
+                  (value) => {
+                    if (values.lotId) setFieldValue('lotId', undefined);
+                    handleGetLots(parseInt(value));
+                  }
+                "
                 :disabled="!blocks.length"
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a block" />
+                    <SelectValue
+                      :placeholder="
+                        blocks.length ? 'Select a block' : 'No blocks available'
+                      "
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -202,7 +224,11 @@
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a lot" />
+                    <SelectValue
+                      :placeholder="
+                        lots.length ? 'Select a lot' : 'No lots available'
+                      "
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -220,7 +246,11 @@
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField v-slot="{ componentField }" name="paymentType">
+          <FormField
+            v-if="values.lotId"
+            v-slot="{ componentField }"
+            name="paymentType"
+          >
             <FormItem class="col-span-2">
               <FormLabel>Select Payment Type *</FormLabel>
               <FormControl>
@@ -245,116 +275,7 @@
               <FormMessage />
             </FormItem>
           </FormField>
-          <template v-if="values.paymentType === 'Reservation'">
-            <FormField v-slot="{ componentField }" name="reservation">
-              <FormItem>
-                <FormLabel>Reservation Fee</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min="0"
-                    placeholder="Input reservation fee"
-                    v-bind="componentField"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-            <FormField v-slot="{ componentField }" name="lotPrice">
-              <FormItem>
-                <FormLabel>Lot Price</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    :placeholder="values.lotPrice"
-                    v-bind="componentField"
-                    disabled
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-            <FormField v-slot="{ componentField }" name="modeOfPayment">
-              <FormItem>
-                <FormLabel>Mode Of Payment *</FormLabel>
-                <Select v-bind="componentField">
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a mode of payment" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem
-                        v-for="mode in modeOfPayment"
-                        :key="mode"
-                        :value="mode"
-                      >
-                        {{ mode }}
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-            <FormField v-slot="{ componentField }" name="dateOfPayment">
-              <FormItem>
-                <FormLabel>Date of Payment *</FormLabel>
-                <FormControl>
-                  <VueTailwindDatepicker
-                    v-bind="componentField"
-                    placeholder="Select Date"
-                    :formatter="{
-                      date: 'MM-DD-YYYY',
-                      month: 'MMMM',
-                    }"
-                    as-single
-                    overlay
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-            <FormField name="receipt">
-              <FormItem class="col-span-2">
-                <FormLabel>Receipt *</FormLabel>
-                <FormControl>
-                  <Card
-                    class="flex h-[150px] cursor-pointer flex-col items-center justify-center gap-1 p-4"
-                    @click="
-                      () => {
-                        open();
-                        onChange((file) => {
-                          if (file) {
-                            setFieldValue('receipt', file[0].name);
-                          }
-                        });
-                      }
-                    "
-                  >
-                    <CloudUpload
-                      class="h-8 w-8 rounded-full bg-blue-50 p-2 text-blue-500"
-                    />
-                    <template v-if="!values.receipt">
-                      <p class="text-xs">
-                        <span class="text-blue-500">Click to upload</span> (5mb)
-                      </p>
-                      <p class="text-xs">PNG, JPG, JPEG files only</p>
-                    </template>
-                    <template v-else>
-                      <p class="text-xs">
-                        <span class="text-blue-500">To upload:</span>
-                        {{ values.receipt }}
-                      </p>
-                    </template>
-                  </Card>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-          </template>
-          <template v-else-if="values.paymentType === 'Full Payment'">
+          <template v-if="values.paymentType === 'Full Payment'">
             <FormField v-slot="{ componentField }" name="inNeed">
               <FormItem class="col-span-2">
                 <FormLabel>In need? *</FormLabel>
@@ -362,6 +283,16 @@
                   <RadioGroup
                     class="flex flex-col space-y-1"
                     v-bind="componentField"
+                    @update:model-value="
+                      (v) => {
+                        if (v === 'No') {
+                          setFieldValue('inNeedPrice', undefined);
+                          let actualPrice = values.lotPrice;
+                          actualPrice -= values.discount | 0;
+                          setFieldValue('actualPrice', actualPrice);
+                        }
+                      }
+                    "
                   >
                     <FormItem class="flex items-center gap-x-3 space-y-0">
                       <FormControl>
@@ -388,12 +319,10 @@
                     v-bind="componentField"
                     @update:model-value="
                       (v) => {
-                        setFieldValue(
-                          'actualPrice',
-                          values.lotPrice +
-                            values.lotPrice * parseFloat(values.inNeedPrice) -
-                            parseInt(values.discount || 0)
-                        );
+                        let actualPrice = values.lotPrice;
+                        actualPrice = actualPrice + actualPrice * parseFloat(v);
+                        actualPrice -= parseInt(values.discount || 0);
+                        setFieldValue('actualPrice', actualPrice);
                       }
                     "
                   >
@@ -426,14 +355,16 @@
                         default-value="0"
                         v-bind="componentField"
                         @update:model-value="
-                          (v) => {
-                            setFieldValue(
-                              'actualPrice',
-                              values.lotPrice +
-                                values.lotPrice *
-                                  parseFloat(values.inNeedPrice) -
-                                parseInt(values.discount || 0)
-                            );
+                          (v: any) => {
+                            let actualPrice = values.lotPrice;
+                            if (values.inNeed === 'Yes') {
+                              if (values.inNeedPrice)
+                                actualPrice =
+                                  actualPrice +
+                                  actualPrice * parseFloat(values.inNeedPrice);
+                            }
+                            actualPrice -= v;
+                            setFieldValue('actualPrice', actualPrice);
                           }
                         "
                       />
@@ -511,11 +442,10 @@
                       v-bind="componentField"
                       placeholder="Select Date"
                       :formatter="{
-                        date: 'MM-DD-YYYY',
+                        date: 'YYYY-MM-DD',
                         month: 'MMMM',
                       }"
                       as-single
-                      overlay
                     />
                   </FormControl>
                   <FormMessage />
@@ -532,7 +462,7 @@
                           open();
                           onChange((file) => {
                             if (file) {
-                              setFieldValue('receipt', file[0].name);
+                              setFieldValue('receipt', file[0]);
                             }
                           });
                         }
@@ -551,10 +481,23 @@
                       <template v-else>
                         <p class="text-xs">
                           <span class="text-blue-500">To upload:</span>
-                          {{ values.receipt }}
+                          {{ values.receipt.name }}
                         </p>
                       </template>
                     </Card>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="remarks">
+                <FormItem class="col-span-2">
+                  <FormLabel>Remarks</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      class="resize-none"
+                      placeholder="Enter a comment"
+                      v-bind="componentField"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -583,7 +526,7 @@ import * as z from "zod";
 import { useToast } from "@/components/ui/toast/use-toast";
 import type { Block, Lot, Property } from "~/db/schema";
 import { CloudUpload } from "lucide-vue-next";
-import { useFileDialog, type AnyFn } from "@vueuse/core";
+import { useFileDialog } from "@vueuse/core";
 
 const { open, onChange } = useFileDialog({
   accept: "image/*",
@@ -615,98 +558,47 @@ const modeOfPayment = ref<string[]>([
   "Check Payment",
 ]);
 
-const formSchema = toTypedSchema(
+let baseSchema = z.object({
+  firstName: z.string().min(1, { message: "Please enter a first name" }),
+  lastName: z.string().min(1, { message: "Please enter a last name" }),
+  fullAddress: z.string().min(1, { message: "Please enter an address" }),
+  birthDate: z.array(z.string(), { message: "Please enter a birth date" }),
+  email: z.string().min(1, { message: "Please enter an email address" }),
+  mobileNumber: z.string().min(1, { message: "Please enter a mobile number" }),
+  landlineNumber: z.string().optional(),
+  propertyId: z.string().min(1, { message: "Please select a property" }),
+  blockId: z.string().min(1, { message: "Please select a block" }),
+  lotId: z.string().min(1, { message: "Please select a lot" }),
+  paymentType: z.enum(["Reservation", "Monthly Terms", "Full Payment"], {
+    message: "Please select a payment type",
+  }),
+  lotPrice: z.number().multipleOf(0.01),
+  modeOfPayment: z.enum(["Bank Transfer", "Cash Payment", "Check Payment"], {
+    message: "Please select a mode of payment",
+  }),
+  dateOfPayment: z.array(z.string(), {
+    message: "Please enter a birth date",
+  }),
+  receipt: z.instanceof(File, { message: "Please upload a receipt" }),
+  discount: z.number().multipleOf(0.01).optional().or(z.literal(0)),
+  actualPrice: z.number().multipleOf(0.01),
+  remarks: z.string().optional(),
+});
+
+let inNeedSchema = z.object({
+  inNeed: z.literal("Yes"),
+  inNeedPrice: z.string({ message: "Please select an option" }),
+});
+
+let notInNeedSchema = z.object({
+  inNeed: z.literal("No"),
+  inNeedPrice: z.string({ message: "Please select an option" }).optional(),
+});
+
+let formSchema = toTypedSchema(
   z
-    .object({
-      firstName: z.string().min(1, { message: "Please enter a first name" }),
-      lastName: z.string().min(1, { message: "Please enter a last name" }),
-      fullAddress: z.string().min(1, { message: "Please enter an address" }),
-      birthDate: z.array(z.string(), { message: "Please enter a birth date" }),
-      email: z.string().min(1, { message: "Please enter an email address" }),
-      mobileNumber: z
-        .string()
-        .min(1, { message: "Please enter a mobile number" }),
-      landlineNumber: z.string().optional(),
-      propertyId: z.string().min(1, { message: "Please select a property" }),
-      blockId: z.string().min(1, { message: "Please select a block" }),
-      lotId: z.string().min(1, { message: "Please select a lot" }),
-      paymentType: z.enum(["Reservation", "Monthly Terms", "Full Payment"], {
-        message: "Please select a payment type",
-      }),
-      // paymentPlan: z
-      //   .enum(
-      //     [
-      //       "Downpayment and Installment (with interest)",
-      //       "Downpayment and Installment (without interest)",
-      //       "Installment only (with interest)",
-      //     ],
-      //     { message: "Please select a payment plan" }
-      //   )
-      //   .optional(),
-      // reservation: z
-      //   .number({ message: "Please enter a reservation fee" })
-      //   .multipleOf(0.01, {
-      //     message: "Reservation fee must be with decimal points of max 2",
-      //   })
-      //   .min(0, {
-      //     message: "Please enter a reservation fee that is higher than 0",
-      //   })
-      //   .optional(),
-      lotPrice: z.number().multipleOf(0.01).optional(),
-      modeOfPayment: z
-        .enum(["Bank Transfer", "Cash Payment", "Check Payment"], {
-          message: "Please select a mode of payment",
-        })
-        .optional(),
-      dateOfPayment: z
-        .array(z.string(), {
-          message: "Please enter a birth date",
-        })
-        .optional(),
-      receipt: z.any({ message: "Please upload a receipt" }).optional(),
-      inNeed: z
-        .enum(["Yes", "No"], {
-          required_error: "Please select an option111",
-        })
-        .optional(),
-      inNeedPrice: z
-        .string({ message: "Please select an option222" })
-        .optional(),
-      discount: z.number().multipleOf(0.01).optional().or(z.literal(0)),
-      actualPrice: z.number().multipleOf(0.01),
-    })
-    .refine((value) => {
-      if (
-        value.paymentType === "Full Payment" &&
-        value.modeOfPayment &&
-        value.dateOfPayment &&
-        value.receipt
-      ) {
-        if (
-          value.inNeed === "Yes" &&
-          value.inNeedPrice &&
-          value.lotPrice &&
-          value.actualPrice &&
-          value.modeOfPayment &&
-          value.dateOfPayment.length &&
-          value.receipt
-        ) {
-          return true;
-        } else if (
-          value.inNeed === "No" &&
-          value.lotPrice &&
-          value.actualPrice &&
-          value.modeOfPayment &&
-          value.dateOfPayment.length &&
-          value.receipt
-        ) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-      return false;
-    })
+    .discriminatedUnion("inNeed", [inNeedSchema, notInNeedSchema])
+    .and(baseSchema)
 );
 
 onMounted(async () => handleGetProperties());
@@ -762,10 +654,31 @@ function getLotInfo(values: any) {
     email,
     mobileNumber,
     landlineNumber,
+    dateOfPayment,
+    receipt,
     ...lot
   } = values;
-
   return lot;
+}
+
+async function handleUploadReceipt(receipt: File) {
+  try {
+    const config = useRuntimeConfig();
+    const formData = new FormData();
+    formData.append("api_key", config.public.cloudinary.apiKey);
+    formData.append("file", receipt);
+    formData.append("upload_preset", config.public.cloudinary.uploadPreset);
+    const response: any = await $fetch(
+      `https://api.cloudinary.com/v1_1/${config.public.cloudinary.cloudName}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+    return response.public_id;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function handleCreateClient(values: any) {
@@ -775,6 +688,7 @@ async function handleCreateClient(values: any) {
     values.dateOfPayment = values.dateOfPayment[0];
     const { user } = useUserSession();
     const sessionData = { id: null, ...user.value };
+
     let body = {
       ...getClientInfo(values),
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
@@ -783,8 +697,10 @@ async function handleCreateClient(values: any) {
       method: "POST",
       body,
     });
+
     body = {
       ...getLotInfo(values),
+      perpetualCarePrice: values.lotPrice * 0.1,
       clientId: response.client.id,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
     };
@@ -797,10 +713,25 @@ async function handleCreateClient(values: any) {
       method: "PUT",
       body: { taken: true },
     });
+
+    const receipt = await handleUploadReceipt(values.receipt);
+    body = {
+      clientLotId: response.clientLot.id,
+      purpose: "Full Payment",
+      payment: values.actualPrice,
+      dateOfPayment: values.dateOfPayment,
+      receipt,
+      remarks: values.remarks,
+      createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
+    };
+    await $fetch("/api/invoices/create", {
+      method: "POST",
+      body,
+    });
     handleGetProperties();
     toast({
       title: "Success",
-      description: response.message,
+      description: "Client has been created",
       variant: "success",
     });
     emit("refresh");
