@@ -5,23 +5,26 @@
       <h1 class="font-semibold">Pines Memorial</h1>
     </div>
     <div v-for="(group, i) in groups" :key="i">
-      <p class="text-sm text-muted-foreground">{{ group.name }}</p>
-      <NuxtLink
-        v-for="(route, j) in group.routes"
-        :key="j"
-        :to="{ name: route.name }"
-      >
-        <Button
-          variant="ghost"
-          class="flex w-full items-center justify-start gap-2 p-2"
-          :class="{
-            'bg-accent text-accent-foreground': active === route.name,
-          }"
+      <template v-if="group.access.includes(userRole)">
+        <p class="text-sm text-muted-foreground">{{ group.name }}</p>
+        <NuxtLink
+          v-for="(route, j) in group.routes"
+          :key="j"
+          :to="{ name: route.name }"
         >
-          <component :is="route.meta.icon" />
-          <span class="font-semibold">{{ route.name }}</span>
-        </Button>
-      </NuxtLink>
+          <Button
+            v-if="route.meta.access.includes(userRole)"
+            variant="ghost"
+            class="flex w-full items-center justify-start gap-2 p-2"
+            :class="{
+              'bg-accent text-accent-foreground': active === route.name,
+            }"
+          >
+            <component :is="route.meta.icon" />
+            <span class="font-semibold">{{ route.name }}</span>
+          </Button>
+        </NuxtLink>
+      </template>
     </div>
     <div class="mt-auto">
       <Button
@@ -43,15 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  TreePine,
-  Users,
-  ChartColumnIncreasing,
-  MapPin,
-  UserRoundCog,
-  LogOut,
-  LoaderCircle,
-} from "lucide-vue-next";
+import { TreePine, LogOut, LoaderCircle } from "lucide-vue-next";
 import type { RouteRecordNameGeneric } from "vue-router";
 import Button from "../ui/button/Button.vue";
 import { sidebarRoutes } from "~/app/router.options";
@@ -60,6 +55,8 @@ const loading = ref<boolean>(false);
 const active = ref<RouteRecordNameGeneric>("");
 const route = useRoute();
 const groups = ref(sidebarRoutes);
+const session = useUserSession();
+const userRole = ref<string>(session.user.value?.role || "");
 
 onMounted(async () => {
   const { name } = useRoute();

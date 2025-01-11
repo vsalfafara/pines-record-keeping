@@ -43,7 +43,7 @@ export const users = schema.table("users", {
   password: t.varchar("password").notNull(),
   role: roles().default("ACCOUNTS_CLERK"),
   hasLoggedInOnce: t.boolean("has_logged_in_once").default(false),
-  createdBy: t.varchar("created_by"),
+  createdBy: t.varchar("created_by").notNull(),
   createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
 });
 
@@ -108,7 +108,7 @@ export const clientLots = schema.table("client_lots", {
   actualPrice: t.integer("actual_price"),
   balance: t.integer("balance"),
   agent: t.varchar("agent"),
-  createdBy: t.varchar("created_by"),
+  createdBy: t.varchar("created_by").notNull(),
   createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
 });
 
@@ -147,7 +147,7 @@ export const invoices = schema.table("invoices", {
   dateOfPayment: t.date("date_of_payment", { mode: "string" }).notNull(),
   receipt: t.varchar("receipt").notNull(),
   remarks: t.varchar("remarks"),
-  createdBy: t.varchar("created_by"),
+  createdBy: t.varchar("created_by").notNull(),
   createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
 });
 
@@ -159,7 +159,7 @@ export const expenses = schema.table("expenses", {
   dateOfPayment: t.date("date_of_payment", { mode: "string" }).notNull(),
   receipt: t.varchar("receipt").notNull(),
   remarks: t.varchar("remarks"),
-  createdBy: t.varchar("created_by"),
+  createdBy: t.varchar("created_by").notNull(),
   createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
 });
 

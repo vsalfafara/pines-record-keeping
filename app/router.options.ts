@@ -9,12 +9,14 @@ import {
 export const sidebarRoutes = [
   {
     name: "Platform",
+    access: ["ADMIN", "ACCOUNTS_CLERK"],
     routes: [
       {
         name: "Client Records",
         path: "/client-records",
         meta: {
           icon: Users,
+          access: ["ADMIN", "ACCOUNTS_CLERK"],
         },
         component: () => import("~/pages/client-records/index.vue"),
       },
@@ -22,12 +24,14 @@ export const sidebarRoutes = [
   },
   {
     name: "Admin",
+    access: ["ADMIN"],
     routes: [
       {
         name: "Property Portfolio",
         path: "/property-portfolio",
         meta: {
           icon: MapPin,
+          access: ["ADMIN"],
         },
         component: () => import("~/pages/property-portfolio/index.vue"),
       },
@@ -36,6 +40,7 @@ export const sidebarRoutes = [
         path: "/access-management",
         meta: {
           icon: ChartColumnIncreasing,
+          access: ["ADMIN"],
         },
         component: () => import("~/pages/access-management.vue"),
       },

@@ -183,7 +183,7 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Full Address", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Email Address", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("email")),
