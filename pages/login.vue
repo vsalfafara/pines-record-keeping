@@ -77,7 +77,7 @@ definePageMeta({
   middleware: () => {
     const { loggedIn } = useUserSession();
     if (loggedIn.value) {
-      return navigateTo("/access-management");
+      return navigateTo({ name: "Client Records" });
     }
   },
 });
@@ -109,7 +109,7 @@ const onSubmit = handleSubmit(async (values) => {
     });
     const { fetch } = useUserSession();
     await fetch();
-    await navigateTo("/access-management");
+    await navigateTo({ name: "Client Records" });
   } catch (error: any) {
     toast({
       title: error.response._data.message,
