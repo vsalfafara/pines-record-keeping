@@ -36,6 +36,7 @@ export default defineEventHandler(async () => {
       noOfLots,
       takenLots,
       availableLots,
+      blocks,
       ...otherPropertyInfo,
     };
   });

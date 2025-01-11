@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "~/db";
-import { Block, properties } from "~/db/schema";
+import { properties } from "~/db/schema";
 
 export default defineEventHandler(async (event) => {
   try {

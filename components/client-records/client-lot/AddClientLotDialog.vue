@@ -503,8 +503,8 @@ onMounted(async () => handleGetProperties());
 async function handleGetProperties() {
   loading.value = true;
   try {
-    const data = await $fetch(`/api/properties/all`);
-    properties.value = data as any;
+    const data: any = await $fetch(`/api/properties/all`);
+    properties.value = data.properties;
     blocks.value = [];
     lots.value = [];
   } catch (error) {
