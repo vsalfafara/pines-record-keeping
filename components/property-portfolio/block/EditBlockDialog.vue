@@ -174,7 +174,7 @@ import { valueUpdater } from "~/lib/utils";
 import type { Block, Lot } from "~/db/schema";
 import EditLotDialog from "./lot/EditLotDialog.vue";
 import DeleteLotDialog from "./lot/DeleteLotDialog.vue";
-import RemarksTooltip from "@/components/custom/remarks-tooltip/RemarksTooltip.vue";
+import RemarksTooltip from "~/components/custom/RemarksTooltip.vue";
 
 const { blockData } = defineProps<{
   blockData: Block & { lots?: Lot[] };

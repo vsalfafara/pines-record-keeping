@@ -296,6 +296,15 @@ async function handleCreateInvoice(values: any) {
         body: {},
       });
     }
+    if (values.purpose === "Perpetual Care") {
+      await $fetch(`/api/perpetual-cares/create`, {
+        method: "POST",
+        body: {
+          paymentDue: clientLot.perpetualCarePrice,
+          clientLotId: clientLot.id,
+        },
+      });
+    }
     toast({
       title: "Success",
       description: response.message,

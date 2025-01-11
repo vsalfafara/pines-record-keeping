@@ -1,0 +1,1 @@
+ALTER TABLE "pines-dev"."perpetual_cares" ADD COLUMN "payment_due" integer NOT NULL;

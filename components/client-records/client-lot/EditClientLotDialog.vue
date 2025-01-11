@@ -202,7 +202,7 @@
             <Interments :client-lot="clientLotData"
           /></TabsContent>
           <TabsContent value="perpetual-care">
-            <p>No content yet</p>
+            <PerpetualCares :client-lot="clientLotData" />
           </TabsContent>
           <TabsContent value="invoices">
             <Invoices :client-lot="clientLotData" />
@@ -224,6 +224,7 @@ import * as z from "zod";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { useDateFormat } from "@vueuse/core";
 import Interments from "./Interments.vue";
+import PerpetualCares from "./PerpetualCares.vue";
 import Invoices from "./Invoices.vue";
 import type { ClientLot, Invoice } from "~/db/schema";
 

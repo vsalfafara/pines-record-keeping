@@ -29,10 +29,6 @@
             </DropdownMenuCheckboxItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <AddInvoiceDialog
-          :client-lot="clientLot"
-          @refresh="handleGetInvoices"
-        />
       </div>
     </div>
     <div class="max-h-[400px] overflow-y-auto rounded-md border">
@@ -102,7 +98,6 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import * as z from "zod";
 import {
   Settings2,
   Plus,
@@ -111,28 +106,26 @@ import {
   Trash,
   Pencil,
 } from "lucide-vue-next";
-import type { ClientLot, Invoice } from "~/db/schema";
+import type { ClientLot, Interment, PerpetualCare } from "~/db/schema";
 import { useDateFormat } from "@vueuse/core";
 import { valueUpdater } from "~/lib/utils";
-import RemarksTooltip from "~/components/custom/RemarksTooltip.vue";
-import Receipt from "./Receipt.vue";
 import { useCurrencyFormatter } from "#build/imports";
-import AddInvoiceDialog from "./AddInvoiceDialog.vue";
+import { Badge } from "~/components/ui/badge";
 
 const { clientLot } = defineProps<{ clientLot: ClientLot }>();
 
+type CustomPerpetualCare = PerpetualCare & { status: string; paid: number };
+
 const toPHP = useCurrencyFormatter();
 const loading = ref<boolean>(false);
-const invoices = ref<Invoice[]>([]);
+const perpetualCares = ref<CustomPerpetualCare[]>([]);
 
-const columnHelper = createColumnHelper<Invoice>();
+const columnHelper = createColumnHelper<CustomPerpetualCare>();
 
-onMounted(() => {
-  handleGetInvoices();
-});
+onMounted(() => handleGetInterments());
 
 const columns = [
-  columnHelper.accessor("purpose", {
+  columnHelper.accessor("status", {
     header: ({ column }) => {
       return h(
         Button,
@@ -140,12 +133,16 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Purpose", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Status", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("purpose")),
+    cell: ({ row }) => {
+      const status: string = row.getValue("status");
+      const variant = status === "Paid" ? "success" : "pending";
+      return h(Badge, { variant }, status);
+    },
   }),
-  columnHelper.accessor("payment", {
+  columnHelper.accessor("installmentYears", {
     header: ({ column }) => {
       return h(
         Button,
@@ -153,13 +150,13 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Payment", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Installment Years", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) =>
-      h("div", { class: "px-4" }, toPHP.value.format(row.getValue("payment"))),
+      h("div", { class: "px-4" }, row.getValue("installmentYears")),
   }),
-  columnHelper.accessor("dateOfPayment", {
+  columnHelper.accessor("dueDate", {
     header: ({ column }) => {
       return h(
         Button,
@@ -167,17 +164,17 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Date of Payment", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Due Date", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) =>
       h(
         "div",
         { class: "px-4" },
-        useDateFormat(row.getValue("dateOfPayment"), "DD MMM YYYY").value
+        useDateFormat(row.getValue("dueDate"), "DD MMM YYYY").value
       ),
   }),
-  columnHelper.accessor("remarks", {
+  columnHelper.accessor("paymentDue", {
     header: ({ column }) => {
       return h(
         Button,
@@ -185,72 +182,39 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Remarks", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["[Remains] Died", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => {
-      const remarks: string = row.getValue("remarks");
-      return h(RemarksTooltip, {
-        remarks: remarks,
-      });
-    },
-  }),
-  columnHelper.accessor("receipt", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Receipt", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => {
-      const receiptName: string = row.getValue("receipt");
-      return h(Receipt, { class: "px-4", receipt: receiptName });
-    },
-  }),
-  columnHelper.accessor("createdBy", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Created By", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("createdBy")),
-  }),
-  columnHelper.accessor("createdAt", {
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Created At", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => {
-      return h(
+    cell: ({ row }) =>
+      h(
         "div",
         { class: "px-4" },
-        useDateFormat(row.getValue("createdAt"), "DD MMM YYYY").value
+        toPHP.value.format(row.getValue("paymentDue"))
+      ),
+  }),
+
+  columnHelper.accessor("paid", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Paid", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
+    cell: ({ row }) =>
+      h("div", { class: "px-4" }, toPHP.value.format(row.getValue("paid"))),
   }),
 ];
 
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
-const columnVisibility = ref<VisibilityState>();
+const columnVisibility = ref<VisibilityState>({});
 
 const table = useVueTable({
-  data: invoices,
+  data: perpetualCares,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -278,11 +242,11 @@ const table = useVueTable({
   },
 });
 
-async function handleGetInvoices() {
+async function handleGetInterments() {
   loading.value = true;
   try {
-    const response: any = await $fetch(`/api/invoices/${clientLot.id}`);
-    invoices.value = response;
+    const response: any = await $fetch(`/api/perpetual-cares/${clientLot.id}`);
+    perpetualCares.value = response;
   } catch (error) {
     console.log(error);
   }

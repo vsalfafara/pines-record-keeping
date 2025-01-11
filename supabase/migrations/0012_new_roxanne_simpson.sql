@@ -1,0 +1,1 @@
+ALTER TABLE "pines-dev"."perpetual_cares" ALTER COLUMN "installment_years" SET DATA TYPE varchar;

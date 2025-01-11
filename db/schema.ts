@@ -133,11 +133,9 @@ export const interments = schema.table("interments", {
 export const perpetualCares = schema.table("perpetual_cares", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   clientLotId: t.integer("client_lot_id").notNull(),
-  installmentYears: t.integer("installment_years"),
+  installmentYears: t.varchar("installment_years"),
   dueDate: t.date("due_date", { mode: "string" }).notNull(),
-  paymentDue: t.varchar("payment_due").notNull(),
-  paid: t.doublePrecision("paid").notNull(),
-  remainingBalance: t.integer("remaining_balance").notNull(),
+  paymentDue: t.integer("payment_due").notNull(),
 });
 
 export const invoices = schema.table("invoices", {
