@@ -6,12 +6,12 @@ export default defineEventHandler(async (event) => {
   const body: any = await readBody(event);
 
   try {
-    const paymentDue = body.lotPrice * 0.1;
+    const paymentDue = body.perpetualCarePrice;
     const { clientLotId } = body;
     const perpetualCareRows = [];
     const today = new Date();
 
-    for (let x = 10; x <= 100; x += 10) {
+    for (let x = 0; x <= 100; x += 10) {
       const installmentMonths = new Date(
         today.getFullYear() + x,
         today.getMonth() + 1,

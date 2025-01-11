@@ -1,3 +1,4 @@
+@import "@vuepic/vue-datepicker/dist/main.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -32,6 +33,15 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
+
+    --dp-font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+    --dp-border-radius: 8px;
+    --dp-font-size: 0.8rem;
+    --dp-border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
+    --dp-input-padding: 10px 48px 10px 12px;
+    --dp-preview-font-size: 0.8rem;
   }
 
   .dark {

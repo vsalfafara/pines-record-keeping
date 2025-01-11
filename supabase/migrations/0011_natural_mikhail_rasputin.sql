@@ -1,0 +1,1 @@
+ALTER TABLE "pines-dev"."interments" ADD COLUMN "interment_time" varchar;

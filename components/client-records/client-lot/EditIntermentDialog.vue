@@ -162,7 +162,7 @@
             </FormItem>
           </FormField>
           <FormField v-slot="{ componentField }" name="intermentDate">
-            <FormItem class="col-span-2">
+            <FormItem>
               <FormLabel>Interment Date</FormLabel>
               <FormControl>
                 <VueTailwindDatepicker
@@ -174,6 +174,25 @@
                   }"
                   as-single
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="intermentTime">
+            <FormItem>
+              <FormLabel>Interment Time</FormLabel>
+              <FormControl>
+                <VueTimePicker
+                  placeholder="Select Time"
+                  v-bind="componentField"
+                  time-picker
+                  :is-24="false"
+                  model-type="hh:mm aaaaa'm'"
+                >
+                  <template #input-icon>
+                    <Clock class="ml-2 h-4 w-4" />
+                  </template>
+                </VueTimePicker>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -220,7 +239,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, LoaderCircle, Pencil } from "lucide-vue-next";
+import { Plus, LoaderCircle, Pencil, Clock } from "lucide-vue-next";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import { useToast } from "@/components/ui/toast/use-toast";
@@ -262,40 +281,30 @@ const modeOfPayment = ref<string[]>([
 let formSchema = toTypedSchema(
   z.object({
     dig: z.number().default(interment.dig || 0),
-    type: z.enum(["Flesh", "Bone", "Perpetual Care"], {
-      message: "Please select a type",
-    }),
+    type: z
+      .enum(["Flesh", "Bone", "Perpetual Care"], {
+        message: "Please select a type",
+      })
+      .optional()
+      .nullable(),
     deceasedName: z
       .string()
-      .min(1, { message: "Please enter a name" })
-      .default(interment.deceasedName || ""),
-    deceasedBorn: z.array(z.string(), {
-      message: "Please enter a date",
-    }),
-    deceasedDied: z.array(z.string(), {
-      message: "Please enter a date",
-    }),
+      .default(interment.deceasedName || "")
+      .optional()
+      .nullable(),
+    deceasedBorn: z.array(z.string().optional().nullable()),
+    deceasedDied: z.array(z.string().optional().nullable()),
     remainsName: z
       .string()
-      .min(1, { message: "Please enter a name" })
-      .default(interment.remainsName || ""),
-    remainsBorn: z.array(z.string(), {
-      message: "Please enter a date",
-    }),
-    remainsDied: z.array(z.string(), {
-      message: "Please enter a date",
-    }),
-    intermentDate: z.array(z.string(), {
-      message: "Please enter a date",
-    }),
-    contractorName: z
-      .string()
-      .min(1, { message: "Please enter a contractor name" })
-      .default(interment.contractorName || ""),
-    contractorMobileNumber: z
-      .string()
-      .min(1, { message: "Please enter a mobile number" })
-      .default(interment.contractorMobileNumber || ""),
+      .default(interment.remainsName || "")
+      .optional()
+      .nullable(),
+    remainsBorn: z.array(z.string().optional().nullable()),
+    remainsDied: z.array(z.string().optional().nullable()),
+    intermentDate: z.array(z.string().optional().nullable()),
+    intermentTime: z.string().optional().nullable(),
+    contractorName: z.string().optional().nullable(),
+    contractorMobileNumber: z.string().optional().nullable(),
   })
 );
 

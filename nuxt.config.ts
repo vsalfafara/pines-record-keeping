@@ -10,6 +10,9 @@ export default defineNuxtConfig({
     "@nuxtjs/cloudinary",
     "nuxt-auth-utils",
   ],
+  build: {
+    transpile: ["@vuepic/vue-datepicker"],
+  },
   shadcn: {
     prefix: "",
     componentDir: "./components/ui",

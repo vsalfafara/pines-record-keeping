@@ -2,7 +2,6 @@ import { relations } from "drizzle-orm";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import * as t from "drizzle-orm/pg-core";
 import "dotenv/config";
-import { client } from ".";
 
 const schemaName: string = process.env.SCHEMA || "";
 
@@ -124,6 +123,7 @@ export const interments = schema.table("interments", {
   remainsBorn: t.date("remains_born", { mode: "string" }),
   remainsDied: t.date("remains_died", { mode: "string" }),
   intermentDate: t.date("interment_date", { mode: "string" }),
+  intermentTime: t.varchar("interment_time"),
   contractorName: t.varchar("contractor_name"),
   contractorMobileNumber: t.varchar("contractor_mobile_number"),
   lastModifiedBy: t.varchar("created_by"),
@@ -133,7 +133,7 @@ export const interments = schema.table("interments", {
 export const perpetualCares = schema.table("perpetual_cares", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   clientLotId: t.integer("client_lot_id").notNull(),
-  installmentMonths: t.integer("installment_months").notNull(),
+  installmentYears: t.integer("installment_years"),
   dueDate: t.date("due_date", { mode: "string" }).notNull(),
   paymentDue: t.varchar("payment_due").notNull(),
   paid: t.doublePrecision("paid").notNull(),

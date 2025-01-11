@@ -237,6 +237,23 @@ const columns = [
           : ""
       ),
   }),
+  columnHelper.accessor("intermentTime", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Interment Time", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) => {
+      let time: string = row.getValue("intermentTime");
+      time = time ? time.toUpperCase() : time;
+      return h("div", { class: "px-4" }, time);
+    },
+  }),
   columnHelper.accessor("contractorName", {
     header: ({ column }) => {
       return h(
