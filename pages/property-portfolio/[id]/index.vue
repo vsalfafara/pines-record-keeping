@@ -225,13 +225,19 @@ const breadcrumbs = ref<BreadcrumbType[]>([
   },
 ]);
 
+type CustomBlock = Block & {
+  noOfLots: number;
+  takenLots: number;
+  availableLots: number;
+};
+
 const { params } = useRoute();
 const { id } = params;
 const { toast } = useToast();
 
 const property = ref<Property>();
 
-const blocks = ref<Block[]>([]);
+const blocks = ref<CustomBlock[]>([]);
 const loading = ref<boolean>(false);
 
 const formSchema = toTypedSchema(
@@ -241,7 +247,7 @@ const formSchema = toTypedSchema(
   })
 );
 
-const columnHelper = createColumnHelper<Block>();
+const columnHelper = createColumnHelper<CustomBlock>();
 
 const columns = [
   columnHelper.accessor("name", {
@@ -256,6 +262,59 @@ const columns = [
       );
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("name")),
+  }),
+  columnHelper.accessor("noOfLots", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["# of Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("noOfLots")),
+  }),
+  columnHelper.accessor("takenLots", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Taken Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("takenLots")),
+  }),
+  columnHelper.accessor("availableLots", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Available Lots", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) =>
+      h("div", { class: "px-4" }, row.getValue("availableLots")),
+  }),
+  columnHelper.accessor("createdBy", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Created At", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("createdBy")),
   }),
   columnHelper.accessor("createdAt", {
     header: ({ column }) => {
@@ -350,10 +409,9 @@ onMounted(async () => handleGetProperty());
 async function handleGetProperty() {
   loading.value = true;
   try {
-    const data = await $fetch(`/api/properties/${id}`);
+    const data: any = await $fetch(`/api/properties/${id}`);
     property.value = data as any;
-    blocks.value = property.value?.blocks || [];
-
+    blocks.value = data.blocks || [];
     if (breadcrumbs.value.length == 2) {
       breadcrumbs.value[1].label = property.value?.name || "";
     } else {
