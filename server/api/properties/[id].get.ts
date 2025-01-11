@@ -18,11 +18,19 @@ export default defineEventHandler(async (event) => {
       });
       if (property) {
         const { blocks, ...otherPropertyInfo } = property;
-
+        let totalNoOfBlocks = blocks.length;
+        let totalNoOfLots = 0;
+        let totalTakenLots = 0;
+        let totalAvailableLots = 0;
         const data = blocks.map((block) => {
           const noOfLots = block.lots.length;
           const takenLots = block.lots.filter((lot) => lot.taken).length;
           const availableLots = block.lots.filter((lot) => !lot.taken).length;
+
+          totalNoOfLots += noOfLots;
+          totalTakenLots += takenLots;
+          totalAvailableLots += availableLots;
+
           return {
             noOfLots,
             takenLots,
@@ -32,6 +40,10 @@ export default defineEventHandler(async (event) => {
         });
         return {
           ...otherPropertyInfo,
+          totalNoOfBlocks,
+          totalNoOfLots,
+          totalTakenLots,
+          totalAvailableLots,
           blocks: data,
         };
       } else {

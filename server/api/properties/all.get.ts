@@ -11,7 +11,10 @@ export default defineEventHandler(async () => {
     },
   });
 
-  return data.map((property) => {
+  let totalAvailableLots = 0;
+  let totalTakenLots = 0;
+
+  const propertiesInfo = data.map((property) => {
     const { blocks, ...otherPropertyInfo } = property;
 
     const noOfBlocks = property.blocks.length;
@@ -25,6 +28,9 @@ export default defineEventHandler(async () => {
       return (current += block.lots.filter((lot) => !lot.taken).length);
     }, 0);
 
+    totalAvailableLots += availableLots;
+    totalTakenLots += takenLots;
+
     return {
       noOfBlocks,
       noOfLots,
@@ -33,16 +39,9 @@ export default defineEventHandler(async () => {
       ...otherPropertyInfo,
     };
   });
-
-  return data;
-
-  return await db.query.properties.findMany({
-    with: {
-      blocks: {
-        with: {
-          lots: true,
-        },
-      },
-    },
-  });
+  return {
+    properties: propertiesInfo,
+    totalAvailableLots,
+    totalTakenLots,
+  };
 });

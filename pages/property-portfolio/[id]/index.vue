@@ -41,6 +41,45 @@
                   <FormMessage />
                 </FormItem>
               </FormField>
+              <FormField name="noOfBlocks">
+                <FormItem>
+                  <FormLabel>Total # of Blocks</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      :default-value="property.totalNoOfBlocks"
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+              <FormField name="takenLots">
+                <FormItem>
+                  <FormLabel>Total Taken Lots</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      :default-value="property.totalTakenLots"
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+              <FormField name="createdBy">
+                <FormItem>
+                  <FormLabel>Created By</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      :default-value="property.createdBy"
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
               <FormField v-slot="{ componentField }" name="fullAddress">
                 <FormItem>
                   <FormLabel>Full Address</FormLabel>
@@ -49,6 +88,32 @@
                       type="text"
                       v-bind="componentField"
                       :default-value="property.fullAddress"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+              <FormField name="noOfLots">
+                <FormItem>
+                  <FormLabel>Total # of Lots</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      :default-value="property.totalNoOfLots"
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+              <FormField name="totalAvailableLots">
+                <FormItem>
+                  <FormLabel>Total Available Lots</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      :default-value="property.totalAvailableLots"
+                      disabled
                     />
                   </FormControl>
                   <FormMessage />
@@ -63,19 +128,6 @@
                       :default-value="
                         useDateFormat(property.createdAt, 'DD MMM YYYY').value
                       "
-                      disabled
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-              <FormField name="createdBy">
-                <FormItem>
-                  <FormLabel>Created By</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      :default-value="property.createdBy"
                       disabled
                     />
                   </FormControl>
@@ -235,7 +287,14 @@ const { params } = useRoute();
 const { id } = params;
 const { toast } = useToast();
 
-const property = ref<Property>();
+type CustomProperty = Property & {
+  totalNoOfBlocks: number;
+  totalNoOfLots: number;
+  totalTakenLots: number;
+  totalAvailableLots: number;
+};
+
+const property = ref<CustomProperty>();
 
 const blocks = ref<CustomBlock[]>([]);
 const loading = ref<boolean>(false);

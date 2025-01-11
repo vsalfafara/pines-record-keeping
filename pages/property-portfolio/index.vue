@@ -1,6 +1,12 @@
 <template>
   <NuxtLayout :breadcrumbs="breadcrumbs">
-    <h1 class="mb-2 text-2xl font-semibold">Property Portfolio</h1>
+    <div class="mb-2 flex items-center gap-2">
+      <h1 class="text-2xl font-semibold">Property Portfolio</h1>
+      <Badge variant="outline"
+        >Total available lots {{ totalAvailableLots }}</Badge
+      >
+      <Badge variant="outline">Total taken lots {{ totalTakenLots }}</Badge>
+    </div>
     <p class="mb-4 text-muted-foreground">
       Here's a list of all your property ownings.
     </p>
@@ -152,6 +158,8 @@ type CustomProperty = Property & {
 };
 
 const properties = ref<CustomProperty[]>([]);
+const totalAvailableLots = ref<number>(0);
+const totalTakenLots = ref<number>(0);
 const loading = ref<boolean>(false);
 
 const columnHelper = createColumnHelper<CustomProperty>();
@@ -335,8 +343,10 @@ onMounted(async () => handleGetProperties());
 async function handleGetProperties() {
   loading.value = true;
   try {
-    const data = await $fetch(`/api/properties/all`);
-    properties.value = data as any;
+    const data: any = await $fetch(`/api/properties/all`);
+    properties.value = data.properties;
+    totalAvailableLots.value = data.totalAvailableLots;
+    totalTakenLots.value = data.totalTakenLots;
   } catch (error) {
     console.log(error);
   }

@@ -19,7 +19,7 @@ export const badgeVariants = cva(
           "border-transparent bg-destructive text-white hover:bg-destructive/80",
         pending:
           "border-transparent bg-slate-500 text-white hover:bg-slate-500/80",
-        outline: "text-foreground",
+        outline: "border-slate-900",
       },
     },
     defaultVariants: {
