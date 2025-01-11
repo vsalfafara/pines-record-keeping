@@ -1,1 +1,0 @@
-ALTER TABLE "pines-dev"."lots" ALTER COLUMN "taken" SET NOT NULL;

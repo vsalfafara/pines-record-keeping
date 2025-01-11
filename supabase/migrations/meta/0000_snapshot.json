@@ -1,5 +1,5 @@
 {
-  "id": "31e3588e-120f-49af-8c8b-5b6de5ec5d3a",
+  "id": "bc9e319d-04d4-4871-a462-1f059d659f4b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -43,8 +43,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "created_at": {
-          "name": "created_at",
+        "created_on": {
+          "name": "created_on",
           "type": "date",
           "primaryKey": false,
           "notNull": true,
@@ -195,8 +195,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "created_at": {
-          "name": "created_at",
+        "created_on": {
+          "name": "created_on",
           "type": "date",
           "primaryKey": false,
           "notNull": true,
@@ -280,8 +280,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "created_at": {
-          "name": "created_at",
+        "created_on": {
+          "name": "created_on",
           "type": "date",
           "primaryKey": false,
           "notNull": true,
@@ -360,8 +360,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "created_at": {
-          "name": "created_at",
+        "created_on": {
+          "name": "created_on",
           "type": "date",
           "primaryKey": false,
           "notNull": true,
@@ -482,8 +482,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "created_at": {
-          "name": "created_at",
+        "created_on": {
+          "name": "created_on",
           "type": "date",
           "primaryKey": false,
           "notNull": true,
@@ -562,8 +562,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "created_at": {
-          "name": "created_at",
+        "created_on": {
+          "name": "created_on",
           "type": "date",
           "primaryKey": false,
           "notNull": true,
@@ -634,7 +634,7 @@
           "name": "taken",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": false
         },
         "created_by": {
@@ -643,8 +643,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "created_at": {
-          "name": "created_at",
+        "created_on": {
+          "name": "created_on",
           "type": "date",
           "primaryKey": false,
           "notNull": true,
@@ -752,8 +752,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "created_at": {
-          "name": "created_at",
+        "created_on": {
+          "name": "created_on",
           "type": "date",
           "primaryKey": false,
           "notNull": true,
@@ -834,8 +834,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "created_at": {
-          "name": "created_at",
+        "created_on": {
+          "name": "created_on",
           "type": "date",
           "primaryKey": false,
           "notNull": true,

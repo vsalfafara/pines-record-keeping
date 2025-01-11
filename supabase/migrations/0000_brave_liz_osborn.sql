@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."blocks" (
 	"property_id" integer,
 	"name" varchar NOT NULL,
 	"created_by" varchar NOT NULL,
-	"created_at" date DEFAULT now() NOT NULL
+	"created_on" date DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."client_lots" (
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."client_lots" (
 	"balance" integer,
 	"agent" varchar,
 	"created_by" varchar,
-	"created_at" date DEFAULT now() NOT NULL
+	"created_on" date DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."clients" (
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."clients" (
 	"mobile_number" varchar NOT NULL,
 	"landline_number" varchar,
 	"created_by" varchar NOT NULL,
-	"created_at" date DEFAULT now() NOT NULL
+	"created_on" date DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."expenses" (
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."expenses" (
 	"receipt" varchar NOT NULL,
 	"remarks" varchar,
 	"created_by" varchar,
-	"created_at" date DEFAULT now() NOT NULL
+	"created_on" date DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."interments" (
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."interments" (
 	"contractor_name" varchar,
 	"contractor_mobile_number" varchar,
 	"created_by" varchar,
-	"created_at" date DEFAULT now() NOT NULL
+	"created_on" date DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."invoices" (
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."invoices" (
 	"receipt" varchar NOT NULL,
 	"remarks" varchar,
 	"created_by" varchar,
-	"created_at" date DEFAULT now() NOT NULL
+	"created_on" date DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."lots" (
@@ -99,9 +99,9 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."lots" (
 	"lotType" "lot_type" NOT NULL,
 	"price" numeric NOT NULL,
 	"remarks" varchar,
-	"taken" boolean DEFAULT false,
+	"taken" boolean DEFAULT false NOT NULL,
 	"created_by" varchar NOT NULL,
-	"created_at" date DEFAULT now() NOT NULL
+	"created_on" date DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."perpetual_cares" (
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."properties" (
 	"name" varchar NOT NULL,
 	"full_address" varchar NOT NULL,
 	"created_by" varchar NOT NULL,
-	"created_at" date DEFAULT now() NOT NULL
+	"created_on" date DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."users" (
@@ -129,5 +129,5 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."users" (
 	"role" "role" DEFAULT 'ACCOUNTS_CLERK',
 	"has_logged_in_once" boolean DEFAULT false,
 	"created_by" varchar,
-	"created_at" date DEFAULT now() NOT NULL
+	"created_on" date DEFAULT now() NOT NULL
 );

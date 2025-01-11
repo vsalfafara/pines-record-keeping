@@ -181,7 +181,7 @@
               type="text"
               class="mt-1"
               :default-value="
-                useDateFormat(clientLotData.createdAt, 'DD MMM YYYY').value
+                useDateFormat(clientLotData.createdOn, 'DD MMM YYYY').value
               "
               disabled
             />

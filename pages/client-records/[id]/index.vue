@@ -133,14 +133,14 @@
                 </FormField>
               </div>
               <div class="grid gap-4">
-                <FormField name="createdAt">
+                <FormField name="createdOn">
                   <FormItem>
-                    <FormLabel>Created At</FormLabel>
+                    <FormLabel>Created On</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         :default-value="
-                          useDateFormat(client.createdAt, 'DD MMM YYYY').value
+                          useDateFormat(client.createdOn, 'DD MMM YYYY').value
                         "
                         disabled
                       />
@@ -460,7 +460,7 @@ const columns = [
     },
     cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("createdBy")),
   }),
-  columnHelper.accessor("createdAt", {
+  columnHelper.accessor("createdOn", {
     header: ({ column }) => {
       return h(
         Button,
@@ -468,14 +468,14 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Created At", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Created On", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) => {
       return h(
         "div",
         { class: "px-4" },
-        useDateFormat(row.getValue("createdAt"), "DD MMM YYYY").value
+        useDateFormat(row.getValue("createdOn"), "DD MMM YYYY").value
       );
     },
   }),
