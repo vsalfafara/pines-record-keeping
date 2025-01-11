@@ -297,6 +297,14 @@ useHead({
   title: "Property Porfolio",
 });
 
+onMounted(async () => {
+  handleGetClient();
+  columnVisibility.value = {
+    terms: false,
+    discount: false,
+  };
+});
+
 const breadcrumbs = ref<BreadcrumbType[]>([
   {
     label: "Client Records",
@@ -307,6 +315,7 @@ const breadcrumbs = ref<BreadcrumbType[]>([
 const { params } = useRoute();
 const { id } = params;
 const { toast } = useToast();
+const toPHP = useCurrencyFormatter();
 
 const client = ref<Client>();
 
@@ -406,7 +415,12 @@ const columns = [
         () => ["Lot Price", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.original.lot.price),
+    cell: ({ row }) =>
+      h(
+        "div",
+        { class: "px-4" },
+        toPHP.value.format(parseInt(row.original.lot.price))
+      ),
   }),
   columnHelper.accessor("actualPrice", {
     header: ({ column }) => {
@@ -419,7 +433,12 @@ const columns = [
         () => ["Actual Price", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("actualPrice")),
+    cell: ({ row }) =>
+      h(
+        "div",
+        { class: "px-4" },
+        toPHP.value.format(parseInt(row.getValue("actualPrice")))
+      ),
   }),
   columnHelper.accessor("balance", {
     header: ({ column }) => {
@@ -432,7 +451,12 @@ const columns = [
         () => ["Balance", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "px-4" }, row.getValue("balance")),
+    cell: ({ row }) =>
+      h(
+        "div",
+        { class: "px-4" },
+        toPHP.value.format(parseInt(row.getValue("balance")) || 0)
+      ),
   }),
   columnHelper.accessor("agent", {
     header: ({ column }) => {
@@ -544,8 +568,6 @@ const table = useVueTable({
     },
   },
 });
-
-onMounted(async () => handleGetClient());
 
 async function handleGetClient() {
   loading.value = true;

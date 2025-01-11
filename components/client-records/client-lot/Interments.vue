@@ -120,7 +120,17 @@ const interments = ref<Interment[]>([]);
 
 const columnHelper = createColumnHelper<Interment>();
 
-onMounted(() => handleGetInterments());
+onMounted(() => {
+  handleGetInterments();
+  columnVisibility.value = {
+    deceasedName: false,
+    deceasedBorn: false,
+    deceasedDied: false,
+    remainsName: false,
+    remainsBorn: false,
+    remainsDied: false,
+  };
+});
 
 const columns = [
   columnHelper.accessor("dig", {
@@ -267,6 +277,23 @@ const columns = [
     },
     cell: ({ row }) =>
       h("div", { class: "px-4" }, row.getValue("contractorName")),
+  }),
+  columnHelper.accessor("contractorMobileNumber", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => [
+          "Contractor Mobile Number",
+          h(ArrowUpDown, { class: "ml-2 h-4 w-4" }),
+        ]
+      );
+    },
+    cell: ({ row }) =>
+      h("div", { class: "px-4" }, row.getValue("contractorMobileNumber")),
   }),
   columnHelper.display({
     id: "actions",
