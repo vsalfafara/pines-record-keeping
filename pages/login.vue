@@ -1,6 +1,6 @@
 <template>
   <NuxtLayout name="auth">
-    <div class="grid h-screen lg:grid-cols-2">
+    <div class="grid h-screen lg:grid-cols-3">
       <div class="flex flex-col items-center px-4 py-8">
         <div class="flex gap-2 self-start">
           <img src="/images/logo.png" class="h-12 w-auto" />
@@ -46,7 +46,7 @@
         </div>
         <p class="text-sm text-muted-foreground">@2024 Developed by AlfaTeam</p>
       </div>
-      <div class="md:100vw p-4">
+      <div class="md:100vw col-span-2 p-4">
         <img
           src="/images/login-bg.jpg"
           class="hidden h-full rounded-xl object-cover lg:block"
