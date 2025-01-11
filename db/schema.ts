@@ -17,13 +17,18 @@ export const lotTypes = t.pgEnum("lot_type", [
   "Roadside",
 ]);
 
-export const invoicePurposes = t.pgEnum("purpose", [
+export const invoicePurposes = t.pgEnum("invoice_purpose", [
   "Full Payment",
   "Downpayment",
   "Payment Plan",
   "Interment",
   "Perpetual Care",
   "Reservation",
+]);
+
+export const expensesPurposes = t.pgEnum("expense_purpose", [
+  "Agent Incentive",
+  "Contractor",
 ]);
 
 export const inNeed = t.pgEnum("in_need", ["Yes", "No"]);
@@ -146,6 +151,18 @@ export const invoices = schema.table("invoices", {
   createdAt: t.date("created_at", { mode: "date" }).defaultNow().notNull(),
 });
 
+export const expenses = schema.table("expenses", {
+  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  clientLotId: t.integer("client_lot_id").notNull(),
+  purpose: expensesPurposes().notNull(),
+  payment: t.integer().notNull(),
+  dateOfPayment: t.date("date_of_payment", { mode: "string" }).notNull(),
+  receipt: t.varchar("receipt").notNull(),
+  remarks: t.varchar("remarks"),
+  createdBy: t.varchar("created_by"),
+  createdAt: t.date("created_at", { mode: "date" }).defaultNow().notNull(),
+});
+
 export const propertyRelations = relations(properties, ({ many }) => ({
   blocks: many(blocks),
 }));
@@ -189,6 +206,7 @@ export const clientLotsRelations = relations(clientLots, ({ one, many }) => ({
   invoices: many(invoices),
   interments: many(interments),
   perpetualCare: many(perpetualCares),
+  expenses: many(expenses),
 }));
 
 export const invoicesRelations = relations(invoices, ({ one }) => ({
@@ -208,6 +226,13 @@ export const intermentsRelations = relations(interments, ({ one }) => ({
 export const perpetualCaresRelations = relations(perpetualCares, ({ one }) => ({
   clientLot: one(clientLots, {
     fields: [perpetualCares.clientLotId],
+    references: [clientLots.id],
+  }),
+}));
+
+export const expensesRelations = relations(expenses, ({ one }) => ({
+  clientLot: one(clientLots, {
+    fields: [expenses.clientLotId],
     references: [clientLots.id],
   }),
 }));
@@ -248,3 +273,6 @@ export type NewPerpetualCare = InferInsertModel<typeof perpetualCares>;
 
 export type Interment = InferSelectModel<typeof interments>;
 export type NewInterment = InferInsertModel<typeof interments>;
+
+export type Expense = InferSelectModel<typeof expenses>;
+export type NewExpense = InferInsertModel<typeof expenses>;

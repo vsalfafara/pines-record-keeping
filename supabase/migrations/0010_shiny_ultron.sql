@@ -1,1 +1,0 @@
-ALTER TABLE "pines-dev"."perpetual_cares" RENAME COLUMN "installment_months" TO "installment_years";

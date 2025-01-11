@@ -208,7 +208,7 @@
             <Invoices :client-lot="clientLotData" />
           </TabsContent>
           <TabsContent value="expenses">
-            <p>No content yet</p>
+            <Expenses :client-lot="clientLotData" />
           </TabsContent>
         </Tabs>
       </SheetContent>
@@ -226,6 +226,7 @@ import { useDateFormat } from "@vueuse/core";
 import Interments from "./Interments.vue";
 import PerpetualCares from "./PerpetualCares.vue";
 import Invoices from "./Invoices.vue";
+import Expenses from "./Expenses.vue";
 import type { ClientLot, Invoice } from "~/db/schema";
 
 const { clientLotData } = defineProps<{

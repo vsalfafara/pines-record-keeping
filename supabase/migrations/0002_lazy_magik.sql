@@ -1,1 +1,0 @@
-ALTER TABLE "pines-dev"."lots" ADD COLUMN "taken" boolean DEFAULT false;

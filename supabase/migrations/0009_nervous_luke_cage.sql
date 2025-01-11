@@ -1,1 +1,0 @@
-ALTER TABLE "pines-dev"."perpetual_cares" ALTER COLUMN "installment_months" DROP NOT NULL;

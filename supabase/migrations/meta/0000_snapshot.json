@@ -1,5 +1,5 @@
 {
-  "id": "89eb5965-351c-4e61-9c0b-8d1ed8ac8e0b",
+  "id": "31e3588e-120f-49af-8c8b-5b6de5ec5d3a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -129,9 +129,21 @@
           "primaryKey": false,
           "notNull": false
         },
+        "terms": {
+          "name": "terms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "downpayment": {
           "name": "downpayment",
           "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "perpetual_care_price": {
+          "name": "perpetual_care_price",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -284,6 +296,208 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "pines-dev.expenses": {
+      "name": "expenses",
+      "schema": "pines-dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "expenses_id_seq",
+            "schema": "pines-dev",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "client_lot_id": {
+          "name": "client_lot_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "purpose": {
+          "name": "purpose",
+          "type": "expense_purpose",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payment": {
+          "name": "payment",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_of_payment": {
+          "name": "date_of_payment",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "receipt": {
+          "name": "receipt",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "pines-dev.interments": {
+      "name": "interments",
+      "schema": "pines-dev",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "interments_id_seq",
+            "schema": "pines-dev",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "client_lot_id": {
+          "name": "client_lot_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dig": {
+          "name": "dig",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deceased_name": {
+          "name": "deceased_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deceased_born": {
+          "name": "deceased_born",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deceased_died": {
+          "name": "deceased_died",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remains_name": {
+          "name": "remains_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remains_born": {
+          "name": "remains_born",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remains_died": {
+          "name": "remains_died",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interment_date": {
+          "name": "interment_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interment_time": {
+          "name": "interment_time",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contractor_name": {
+          "name": "contractor_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contractor_mobile_number": {
+          "name": "contractor_mobile_number",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "pines-dev.invoices": {
       "name": "invoices",
       "schema": "pines-dev",
@@ -313,7 +527,7 @@
         },
         "purpose": {
           "name": "purpose",
-          "type": "purpose",
+          "type": "invoice_purpose",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -327,6 +541,12 @@
         "date_of_payment": {
           "name": "date_of_payment",
           "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "receipt": {
+          "name": "receipt",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -410,6 +630,13 @@
           "primaryKey": false,
           "notNull": false
         },
+        "taken": {
+          "name": "taken",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
         "created_by": {
           "name": "created_by",
           "type": "varchar",
@@ -459,11 +686,11 @@
           "primaryKey": false,
           "notNull": true
         },
-        "installment_months": {
-          "name": "installment_months",
-          "type": "integer",
+        "installment_years": {
+          "name": "installment_years",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "due_date": {
           "name": "due_date",
@@ -473,18 +700,6 @@
         },
         "payment_due": {
           "name": "payment_due",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "paid": {
-          "name": "paid",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "remaining_balance": {
-          "name": "remaining_balance",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -530,34 +745,6 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
-        },
-        "number_of_blocks": {
-          "name": "number_of_blocks",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "number_of_lots": {
-          "name": "number_of_lots",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "taken_lots": {
-          "name": "taken_lots",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "available_lots": {
-          "name": "available_lots",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
         },
         "created_by": {
           "name": "created_by",
@@ -665,6 +852,14 @@
     }
   },
   "enums": {
+    "public.expense_purpose": {
+      "name": "expense_purpose",
+      "schema": "public",
+      "values": [
+        "Agent Incentive",
+        "Contractor"
+      ]
+    },
     "public.in_need": {
       "name": "in_need",
       "schema": "public",
@@ -673,13 +868,24 @@
         "No"
       ]
     },
-    "public.purpose": {
-      "name": "purpose",
+    "public.type": {
+      "name": "type",
       "schema": "public",
       "values": [
+        "Flesh",
+        "Bone"
+      ]
+    },
+    "public.invoice_purpose": {
+      "name": "invoice_purpose",
+      "schema": "public",
+      "values": [
+        "Full Payment",
+        "Downpayment",
         "Payment Plan",
         "Interment",
-        "Perpetual Care"
+        "Perpetual Care",
+        "Reservation"
       ]
     },
     "public.lot_type": {

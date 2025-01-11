@@ -1,1 +1,0 @@
-ALTER TABLE "pines-dev"."perpetual_cares" DROP COLUMN IF EXISTS "remaining_balance";

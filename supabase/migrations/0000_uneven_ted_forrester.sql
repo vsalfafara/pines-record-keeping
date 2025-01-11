@@ -1,3 +1,9 @@
+CREATE TYPE "public"."expense_purpose" AS ENUM('Agent Incentive', 'Contractor');--> statement-breakpoint
+CREATE TYPE "public"."in_need" AS ENUM('Yes', 'No');--> statement-breakpoint
+CREATE TYPE "public"."type" AS ENUM('Flesh', 'Bone');--> statement-breakpoint
+CREATE TYPE "public"."invoice_purpose" AS ENUM('Full Payment', 'Downpayment', 'Payment Plan', 'Interment', 'Perpetual Care', 'Reservation');--> statement-breakpoint
+CREATE TYPE "public"."lot_type" AS ENUM('Corner', 'Family Estate', 'Inner', 'Pathway', 'Roadside');--> statement-breakpoint
+CREATE TYPE "public"."role" AS ENUM('ADMIN', 'ACCOUNTS_CLERK');--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."blocks" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "pines-dev"."blocks_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"property_id" integer,
@@ -16,7 +22,9 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."client_lots" (
 	"payment_type" varchar,
 	"payment_plan" varchar,
 	"in_need" "in_need",
+	"terms" integer,
 	"downpayment" varchar,
+	"perpetual_care_price" integer,
 	"discount" integer,
 	"months_to_pay" integer,
 	"monthly" integer,
@@ -41,12 +49,44 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."clients" (
 	"created_at" date DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "pines-dev"."expenses" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "pines-dev"."expenses_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"client_lot_id" integer NOT NULL,
+	"purpose" "expense_purpose" NOT NULL,
+	"payment" integer NOT NULL,
+	"date_of_payment" date NOT NULL,
+	"receipt" varchar NOT NULL,
+	"remarks" varchar,
+	"created_by" varchar,
+	"created_at" date DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "pines-dev"."interments" (
+	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "pines-dev"."interments_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"client_lot_id" integer NOT NULL,
+	"dig" integer,
+	"type" "type",
+	"deceased_name" varchar,
+	"deceased_born" date,
+	"deceased_died" date,
+	"remains_name" varchar,
+	"remains_born" date,
+	"remains_died" date,
+	"interment_date" date,
+	"interment_time" varchar,
+	"contractor_name" varchar,
+	"contractor_mobile_number" varchar,
+	"created_by" varchar,
+	"created_at" date DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."invoices" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "pines-dev"."invoices_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"client_lot_id" integer NOT NULL,
-	"purpose" "purpose" NOT NULL,
+	"purpose" "invoice_purpose" NOT NULL,
 	"payment" integer NOT NULL,
 	"date_of_payment" date NOT NULL,
+	"receipt" varchar NOT NULL,
 	"remarks" varchar,
 	"created_by" varchar,
 	"created_at" date DEFAULT now() NOT NULL
@@ -59,6 +99,7 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."lots" (
 	"lotType" "lot_type" NOT NULL,
 	"price" numeric NOT NULL,
 	"remarks" varchar,
+	"taken" boolean DEFAULT false,
 	"created_by" varchar NOT NULL,
 	"created_at" date DEFAULT now() NOT NULL
 );
@@ -66,21 +107,15 @@ CREATE TABLE IF NOT EXISTS "pines-dev"."lots" (
 CREATE TABLE IF NOT EXISTS "pines-dev"."perpetual_cares" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "pines-dev"."perpetual_cares_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"client_lot_id" integer NOT NULL,
-	"installment_months" integer NOT NULL,
+	"installment_years" varchar,
 	"due_date" date NOT NULL,
-	"payment_due" varchar NOT NULL,
-	"paid" integer NOT NULL,
-	"remaining_balance" integer NOT NULL
+	"payment_due" integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pines-dev"."properties" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "pines-dev"."properties_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"name" varchar NOT NULL,
 	"full_address" varchar NOT NULL,
-	"number_of_blocks" integer DEFAULT 0,
-	"number_of_lots" integer DEFAULT 0,
-	"taken_lots" integer DEFAULT 0,
-	"available_lots" integer DEFAULT 0,
 	"created_by" varchar NOT NULL,
 	"created_at" date DEFAULT now() NOT NULL
 );
