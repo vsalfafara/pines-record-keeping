@@ -4,6 +4,7 @@ import type { NewInvoice } from "~/db/schema";
 
 export default defineEventHandler(async (event) => {
   const body: NewInvoice = await readBody(event);
+  console.log(body);
   try {
     await db
       .insert(invoices)

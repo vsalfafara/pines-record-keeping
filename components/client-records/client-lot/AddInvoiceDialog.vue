@@ -294,7 +294,9 @@ async function handleCreateInvoice(values: any) {
     if (values.purpose === "Interment") {
       await $fetch(`/api/interments/${clientLot.id}`, {
         method: "POST",
-        body: {},
+        body: {
+          lastModifiedAt: useDateFormat(new Date(), "YYYY-MM-DD").value,
+        },
       });
     }
     if (values.purpose === "Perpetual Care") {

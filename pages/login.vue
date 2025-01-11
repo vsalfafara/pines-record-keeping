@@ -2,7 +2,9 @@
   <NuxtLayout name="auth">
     <div class="grid h-screen lg:grid-cols-2">
       <div class="flex flex-col items-center px-4 py-8">
-        <div class="flex gap-2 self-start">Logo here...</div>
+        <div class="flex gap-2 self-start">
+          <img src="/images/logo.png" class="h-12 w-auto" />
+        </div>
         <div
           class="flex w-full max-w-[400px] flex-1 items-center justify-center"
         >

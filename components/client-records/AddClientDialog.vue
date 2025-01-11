@@ -732,6 +732,7 @@ async function handleCreateClient(values: any) {
       receipt,
       remarks: values.remarks,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
+      createdOn: useDateFormat(new Date(), "YYYY-MM-DD").value,
     };
     await $fetch("/api/invoices/create", {
       method: "POST",
