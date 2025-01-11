@@ -3,7 +3,14 @@
     v-slot="{ handleSubmit, resetForm }"
     as=""
     :validation-schema="formSchema"
-    :initial-values="interment"
+    :initial-values="{
+      ...interment,
+      deceasedBorn: [interment.deceasedBorn],
+      deceasedDied: [interment.deceasedDied],
+      remainsBorn: [interment.remainsBorn],
+      remainsDied: [interment.remainsDied],
+      intermentDate: [interment.intermentDate],
+    }"
   >
     <Dialog
       :open="dialogState"
@@ -223,7 +230,6 @@ import { useFileDialog } from "@vueuse/core";
 
 const { interment } = defineProps<{ interment: Interment }>();
 
-console.log(interment);
 const { open, onChange } = useFileDialog({
   accept: "image/*",
 });
@@ -263,15 +269,25 @@ let formSchema = toTypedSchema(
       .string()
       .min(1, { message: "Please enter a name" })
       .default(interment.deceasedName || ""),
-    deceasedBorn: z.string({ message: "Please enter a date" }),
-    deceasedDied: z.string({ message: "Please enter a date" }),
+    deceasedBorn: z.array(z.string(), {
+      message: "Please enter a date",
+    }),
+    deceasedDied: z.array(z.string(), {
+      message: "Please enter a date",
+    }),
     remainsName: z
       .string()
       .min(1, { message: "Please enter a name" })
       .default(interment.remainsName || ""),
-    remainsBorn: z.string({ message: "Please enter a date" }),
-    remainsDied: z.string({ message: "Please enter a date" }),
-    intermentDate: z.string({ message: "Please enter a date" }),
+    remainsBorn: z.array(z.string(), {
+      message: "Please enter a date",
+    }),
+    remainsDied: z.array(z.string(), {
+      message: "Please enter a date",
+    }),
+    intermentDate: z.array(z.string(), {
+      message: "Please enter a date",
+    }),
     contractorName: z
       .string()
       .min(1, { message: "Please enter a contractor name" })
@@ -290,13 +306,17 @@ async function handleUpdateInterment(values: any) {
     const sessionData = { id: null, ...user.value };
     let body = {
       ...values,
+      deceasedBorn: values.deceasedBorn[0],
+      deceasedDied: values.deceasedDied[0],
+      remainsBorn: values.remainsBorn[0],
+      remainsDied: values.remainsDied[0],
+      intermentDate: values.intermentDate[0],
       lastModifiedBy: `${sessionData.firstName} ${sessionData.lastName}`,
     };
     const response: any = await $fetch(`/api/interments/${interment.id}`, {
       method: "PUT",
       body,
     });
-    console.log(response);
     toast({
       title: "Success",
       description: response.message,

@@ -323,9 +323,7 @@ const formSchema = toTypedSchema(
     mobileNumber: z
       .string()
       .min(1, { message: "Please enter a mobile number" }),
-    landlineNumber: z
-      .string()
-      .min(1, { message: "Please enter a landline number" }),
+    landlineNumber: z.string().or(z.null()).optional(),
   })
 );
 

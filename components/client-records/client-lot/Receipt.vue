@@ -7,12 +7,10 @@
       <VisuallyHidden>
         <DialogTitle></DialogTitle>
       </VisuallyHidden>
-      <CldImage
-        :src="receipt"
-        width="1200"
-        height="1500"
-        alt="receipt"
-        fill-background
+      <!-- <CldImage :src="receipt" width="1200" height="1500" alt="receipt" /> -->
+      <img
+        :src="`https://res.cloudinary.com/dreznpjkt/image/upload/v1736597556/${receipt}`"
+        class="h-full w-auto"
       />
     </DialogContent>
   </Dialog>

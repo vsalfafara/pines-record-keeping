@@ -215,7 +215,7 @@ const { toast } = useToast();
 const loading = ref<boolean>(false);
 const dialogState = ref<boolean>(false);
 
-const purposes = ref<string[]>(["Interment", "Payment Plan", "Perpetual Care"]);
+const purposes = ref<string[]>(["Interment", "Perpetual Care"]);
 
 const paymentTypes = ref<string[]>([
   // "Reservation",
@@ -236,7 +236,7 @@ const modeOfPayment = ref<string[]>([
 ]);
 let formSchema = toTypedSchema(
   z.object({
-    purpose: z.enum(["Interment", "Payment Plan", "Perpetual Care"], {
+    purpose: z.enum(["Interment", "Perpetual Care"], {
       message: "Please select a purpose",
     }),
     payment: z.number({ message: "Please enter an amount" }),
@@ -244,7 +244,7 @@ let formSchema = toTypedSchema(
       message: "Please select a mode of payment",
     }),
     dateOfPayment: z.array(z.string(), {
-      message: "Please enter a birth date",
+      message: "Please enter a date",
     }),
     receipt: z.instanceof(File, { message: "Please upload a receipt" }),
     remarks: z.string().optional(),

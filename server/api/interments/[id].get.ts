@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
   try {
     return db.query.interments.findMany({
       where: eq(interments.clientLotId, id),
+      orderBy: interments.dig,
     });
   } catch (error) {
     return { error };

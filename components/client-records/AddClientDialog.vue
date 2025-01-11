@@ -580,7 +580,12 @@ let baseSchema = z.object({
     message: "Please enter a birth date",
   }),
   receipt: z.instanceof(File, { message: "Please upload a receipt" }),
-  discount: z.number().multipleOf(0.01).optional().or(z.literal(0)),
+  discount: z
+    .number({ message: "Please enter an amount" })
+    .min(0)
+    .multipleOf(0.01)
+    .optional()
+    .or(z.literal(0)),
   actualPrice: z.number().multipleOf(0.01),
   remarks: z.string().optional(),
 });
@@ -626,7 +631,7 @@ async function handleGetBlocks(propertyId: number) {
 
 async function handleGetLots(blockId: number) {
   const block = blocks.value.find((block: any) => block.id === blockId);
-  lots.value = block?.lots || [];
+  lots.value = block?.lots.filter((lot: Lot) => !lot.taken) || [];
 }
 
 function getClientInfo(values: any) {
@@ -684,7 +689,7 @@ async function handleUploadReceipt(receipt: File) {
 async function handleCreateClient(values: any) {
   loading.value = true;
   try {
-    values.birthDate = new Date(values.birthDate[0]).toISOString();
+    values.birthDate = values.birthDate[0];
     values.dateOfPayment = values.dateOfPayment[0];
     const { user } = useUserSession();
     const sessionData = { id: null, ...user.value };
@@ -701,6 +706,8 @@ async function handleCreateClient(values: any) {
     body = {
       ...getLotInfo(values),
       perpetualCarePrice: values.lotPrice * 0.1,
+      totalInterest:
+        values.inNeed === "Yes" ? values.lotPrice * values.inNeedPrice : 0,
       clientId: response.client.id,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
     };

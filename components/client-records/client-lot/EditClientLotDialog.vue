@@ -211,11 +211,6 @@
             <p>No content yet</p>
           </TabsContent>
         </Tabs>
-        <!-- <SheetFooter>
-          <SheetClose as-child>
-            <Button type="button" variant="outline"> Cancel </Button>
-          </SheetClose>
-        </SheetFooter> -->
       </SheetContent>
     </Sheet>
   </Form>
@@ -223,7 +218,7 @@
 
 <script setup lang="ts">
 import { Button } from "~/components/ui/button";
-import { Pencil, Plus } from "lucide-vue-next";
+import { Pencil } from "lucide-vue-next";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import { useToast } from "@/components/ui/toast/use-toast";

@@ -131,7 +131,7 @@
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem
-                      v-for="(lot, index) in lots.filter((lot) => !lot.taken)"
+                      v-for="(lot, index) in lots"
                       :key="index"
                       :value="lot.id.toString()"
                     >
@@ -472,7 +472,12 @@ let baseSchema = z.object({
     message: "Please enter a birth date",
   }),
   receipt: z.instanceof(File, { message: "Please upload a receipt" }),
-  discount: z.number().multipleOf(0.01).optional().or(z.literal(0)),
+  discount: z
+    .number({ message: "Please enter an amount" })
+    .min(0)
+    .multipleOf(0.01)
+    .optional()
+    .or(z.literal(0)),
   actualPrice: z.number().multipleOf(0.01),
   remarks: z.string().optional(),
 });
@@ -518,7 +523,7 @@ async function handleGetBlocks(propertyId: number) {
 
 async function handleGetLots(blockId: number) {
   const block = blocks.value.find((block: any) => block.id === blockId);
-  lots.value = block?.lots || [];
+  lots.value = block?.lots.filter((lot: Lot) => !lot.taken) || [];
 }
 
 function getClientInfo(values: any) {
@@ -582,6 +587,8 @@ async function handleCreateClient(values: any) {
     let body = {
       ...getLotInfo(values),
       perpetualCarePrice: values.lotPrice * 0.1,
+      totalInterest:
+        values.inNeed === "Yes" ? values.lotPrice * values.inNeedPrice : 0,
       clientId: clientId,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
     };
