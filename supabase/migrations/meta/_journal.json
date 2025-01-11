@@ -120,6 +120,13 @@
       "when": 1736616933014,
       "tag": "0016_rainy_skrulls",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1736619971257,
+      "tag": "0017_tough_green_goblin",
+      "breakpoints": true
     }
   ]
 }

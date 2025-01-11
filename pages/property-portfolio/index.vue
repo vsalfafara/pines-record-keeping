@@ -130,7 +130,7 @@ import { useDateFormat } from "@vueuse/core";
 import AddPropertyDialog from "~/components/property-portfolio/AddPropertyDialog.vue";
 import DeletePropertyDialog from "~/components/property-portfolio/DeletePropertyDialog.vue";
 import EditPropertyButton from "~/components/property-portfolio/EditPropertyButton.vue";
-import type { Property } from "~/db/schema";
+import { blockRelations, type Lot, type Property } from "~/db/schema";
 import type { BreadcrumbType } from "~/lib/types";
 
 useHead({
@@ -144,10 +144,17 @@ const breadcrumbs = ref<BreadcrumbType[]>([
   },
 ]);
 
-const properties = ref<Property[]>([]);
+type CustomProperty = Property & {
+  noOfBlocks: number;
+  noOfLots: number;
+  takenLots: number;
+  availableLots: number;
+};
+
+const properties = ref<CustomProperty[]>([]);
 const loading = ref<boolean>(false);
 
-const columnHelper = createColumnHelper<Property>();
+const columnHelper = createColumnHelper<CustomProperty>();
 
 const columns = [
   columnHelper.accessor("name", {
@@ -271,12 +278,14 @@ const columns = [
 
       actions.push(h(EditPropertyButton, { property }));
 
-      actions.push(
-        h(DeletePropertyDialog, {
-          property,
-          onRefresh: () => handleGetProperties(),
-        })
-      );
+      if (property.takenLots === 0) {
+        actions.push(
+          h(DeletePropertyDialog, {
+            property,
+            onRefresh: () => handleGetProperties(),
+          })
+        );
+      }
       return h(
         "div",
         {

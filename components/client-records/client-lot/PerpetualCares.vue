@@ -182,7 +182,7 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["[Remains] Died", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Payment Due", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) =>

@@ -1,6 +1,6 @@
 {
-  "id": "8f689836-6214-4ff9-93a3-86253571e4d5",
-  "prevId": "a042cda0-07f6-4fde-ab96-212bd8da3b3d",
+  "id": "5231c548-dea1-409e-8eaf-0f1dfa9343f1",
+  "prevId": "8f689836-6214-4ff9-93a3-86253571e4d5",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -617,6 +617,12 @@
           "type": "date",
           "primaryKey": false,
           "notNull": true
+        },
+        "payment_due": {
+          "name": "payment_due",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -659,34 +665,6 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
-        },
-        "number_of_blocks": {
-          "name": "number_of_blocks",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "number_of_lots": {
-          "name": "number_of_lots",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "taken_lots": {
-          "name": "taken_lots",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "available_lots": {
-          "name": "available_lots",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
         },
         "created_by": {
           "name": "created_by",

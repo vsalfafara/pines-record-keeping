@@ -280,7 +280,7 @@ const columns = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const block = row.original;
+      const block: any = row.original;
 
       const actions = [];
 
@@ -291,12 +291,16 @@ const columns = [
         })
       );
 
-      actions.push(
-        h(DeleteBlockDialog, {
-          block,
-          onRefresh: () => handleGetProperty(),
-        })
-      );
+      const hasTakenLot = block.lots.find((lot: any) => lot.taken);
+
+      if (!hasTakenLot) {
+        actions.push(
+          h(DeleteBlockDialog, {
+            block,
+            onRefresh: () => handleGetProperty(),
+          })
+        );
+      }
       return h(
         "div",
         {

@@ -298,12 +298,14 @@ const columns = [
         h(EditLotDialog, { lot, onRefresh: () => handleGetBlock() })
       );
 
-      actions.push(
-        h(DeleteLotDialog, {
-          lot,
-          onRefresh: () => handleGetBlock(),
-        })
-      );
+      if (!lot.taken) {
+        actions.push(
+          h(DeleteLotDialog, {
+            lot,
+            onRefresh: () => handleGetBlock(),
+          })
+        );
+      }
       return h(
         "div",
         {
