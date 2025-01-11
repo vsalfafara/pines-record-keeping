@@ -202,7 +202,7 @@ import * as z from "zod";
 import { useToast } from "@/components/ui/toast/use-toast";
 import type { ClientLot } from "~/db/schema";
 import { CloudUpload } from "lucide-vue-next";
-import { useFileDialog } from "@vueuse/core";
+import { useDateFormat, useFileDialog } from "@vueuse/core";
 
 const { clientLot } = defineProps<{ clientLot: ClientLot }>();
 
@@ -285,6 +285,7 @@ async function handleCreateInvoice(values: any) {
       receipt,
       remarks: values.remarks,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
+      createdOn: useDateFormat(new Date(), "YYYY-MM-DD").value,
     };
     const response: any = await $fetch("/api/expenses/create", {
       method: "POST",

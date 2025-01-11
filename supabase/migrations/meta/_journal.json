@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1736629181627,
-      "tag": "0000_brave_liz_osborn",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1736632711142,
-      "tag": "0001_acoustic_loners",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1736632825336,
-      "tag": "0002_busy_hairball",
+      "when": 1736634052291,
+      "tag": "0000_skinny_viper",
       "breakpoints": true
     }
   ]

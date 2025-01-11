@@ -52,6 +52,7 @@ import { Plus, LoaderCircle } from "lucide-vue-next";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import { useToast } from "@/components/ui/toast/use-toast";
+import { useDateFormat } from "@vueuse/core";
 
 const emit = defineEmits(["refresh"]);
 const { toast } = useToast();
@@ -74,6 +75,7 @@ async function handleCreateBlock(values: any) {
       ...values,
       propertyId,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
+      createdOn: useDateFormat(new Date(), "YYYY-MM-DD").value,
     };
     const response: any = await $fetch("/api/blocks/create", {
       method: "POST",

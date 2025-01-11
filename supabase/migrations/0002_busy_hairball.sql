@@ -1,1 +1,0 @@
-ALTER TABLE "pines-dev"."properties" ALTER COLUMN "created_on" SET DATA TYPE date;

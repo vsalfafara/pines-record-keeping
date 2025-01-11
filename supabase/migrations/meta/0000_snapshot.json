@@ -1,5 +1,5 @@
 {
-  "id": "bc9e319d-04d4-4871-a462-1f059d659f4b",
+  "id": "6cc25c6e-9c7f-4130-9248-a5402d6d9efd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -47,8 +47,7 @@
           "name": "created_on",
           "type": "date",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},
@@ -193,14 +192,13 @@
           "name": "created_by",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_on": {
           "name": "created_on",
           "type": "date",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},
@@ -284,8 +282,7 @@
           "name": "created_on",
           "type": "date",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},
@@ -358,14 +355,13 @@
           "name": "created_by",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_on": {
           "name": "created_on",
           "type": "date",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},
@@ -486,8 +482,7 @@
           "name": "created_on",
           "type": "date",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},
@@ -560,14 +555,13 @@
           "name": "created_by",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_on": {
           "name": "created_on",
           "type": "date",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},
@@ -647,8 +641,7 @@
           "name": "created_on",
           "type": "date",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},
@@ -756,8 +749,7 @@
           "name": "created_on",
           "type": "date",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},
@@ -832,14 +824,13 @@
           "name": "created_by",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_on": {
           "name": "created_on",
           "type": "date",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
       "indexes": {},

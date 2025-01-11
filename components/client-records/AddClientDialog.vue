@@ -526,7 +526,7 @@ import * as z from "zod";
 import { useToast } from "@/components/ui/toast/use-toast";
 import type { Block, Lot, Property } from "~/db/schema";
 import { CloudUpload } from "lucide-vue-next";
-import { useFileDialog } from "@vueuse/core";
+import { useDateFormat, useFileDialog } from "@vueuse/core";
 
 const { open, onChange } = useFileDialog({
   accept: "image/*",
@@ -697,6 +697,7 @@ async function handleCreateClient(values: any) {
     let body = {
       ...getClientInfo(values),
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
+      createdOn: useDateFormat(new Date(), "YYYY-MM-DD").value,
     };
     let response: any = await $fetch("/api/clients/create", {
       method: "POST",
@@ -710,6 +711,7 @@ async function handleCreateClient(values: any) {
         values.inNeed === "Yes" ? values.lotPrice * values.inNeedPrice : 0,
       clientId: response.client.id,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
+      createdOn: useDateFormat(new Date(), "YYYY-MM-DD").value,
     };
     response = await $fetch("/api/client-lots/create", {
       method: "POST",

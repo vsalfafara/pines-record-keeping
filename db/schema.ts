@@ -44,7 +44,7 @@ export const users = schema.table("users", {
   role: roles().default("ACCOUNTS_CLERK"),
   hasLoggedInOnce: t.boolean("has_logged_in_once").default(false),
   createdBy: t.varchar("created_by").notNull(),
-  createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
+  createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
 export const properties = schema.table("properties", {
@@ -52,7 +52,7 @@ export const properties = schema.table("properties", {
   name: t.varchar("name").notNull(),
   fullAddress: t.varchar("full_address").notNull(),
   createdBy: t.varchar("created_by").notNull(),
-  createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
+  createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
 export const blocks = schema.table("blocks", {
@@ -60,7 +60,7 @@ export const blocks = schema.table("blocks", {
   propertyId: t.integer("property_id"),
   name: t.varchar("name").notNull(),
   createdBy: t.varchar("created_by").notNull(),
-  createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
+  createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
 export const lots = schema.table("lots", {
@@ -72,7 +72,7 @@ export const lots = schema.table("lots", {
   remarks: t.varchar(),
   taken: t.boolean().notNull().default(false),
   createdBy: t.varchar("created_by").notNull(),
-  createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
+  createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
 export const clients = schema.table("clients", {
@@ -85,7 +85,7 @@ export const clients = schema.table("clients", {
   mobileNumber: t.varchar("mobile_number").notNull(),
   landlineNumber: t.varchar("landline_number"),
   createdBy: t.varchar("created_by").notNull(),
-  createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
+  createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
 export const clientLots = schema.table("client_lots", {
@@ -109,7 +109,7 @@ export const clientLots = schema.table("client_lots", {
   balance: t.integer("balance"),
   agent: t.varchar("agent"),
   createdBy: t.varchar("created_by").notNull(),
-  createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
+  createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
 export const interments = schema.table("interments", {
@@ -128,7 +128,10 @@ export const interments = schema.table("interments", {
   contractorName: t.varchar("contractor_name"),
   contractorMobileNumber: t.varchar("contractor_mobile_number"),
   lastModifiedBy: t.varchar("created_by"),
-  lastModifiedAt: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
+  lastModifiedAt: t
+    .date("created_on", { mode: "string" })
+
+    .notNull(),
 });
 
 export const perpetualCares = schema.table("perpetual_cares", {
@@ -148,7 +151,7 @@ export const invoices = schema.table("invoices", {
   receipt: t.varchar("receipt").notNull(),
   remarks: t.varchar("remarks"),
   createdBy: t.varchar("created_by").notNull(),
-  createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
+  createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
 export const expenses = schema.table("expenses", {
@@ -160,7 +163,7 @@ export const expenses = schema.table("expenses", {
   receipt: t.varchar("receipt").notNull(),
   remarks: t.varchar("remarks"),
   createdBy: t.varchar("created_by").notNull(),
-  createdOn: t.date("created_on", { mode: "date" }).defaultNow().notNull(),
+  createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
 export const propertyRelations = relations(properties, ({ many }) => ({
