@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
         .returning();
 
       return {
-        message: `Lot ${lot.name} has been updated`,
+        message: `${lot.name} has been updated`,
       };
     } else {
       setResponseStatus(event, 403);

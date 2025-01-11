@@ -32,6 +32,7 @@
                   type="text"
                   placeholder="Input lot name"
                   v-bind="componentField"
+                  :disabled="lot.taken"
                 />
               </FormControl>
               <FormMessage />
@@ -40,7 +41,7 @@
           <FormField v-slot="{ componentField }" name="lotType">
             <FormItem>
               <FormLabel>Lot Type *</FormLabel>
-              <Select v-bind="componentField">
+              <Select v-bind="componentField" :disabled="lot.taken">
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select lot type" />
@@ -77,6 +78,7 @@
                   step=".01"
                   placeholder="Input price"
                   v-bind="componentField"
+                  :disabled="lot.taken"
                 />
               </FormControl>
               <FormMessage />
@@ -156,6 +158,7 @@ const formSchema = toTypedSchema(
     remarks: z
       .string()
       .optional()
+      .nullable()
       .default(lot.remarks ? lot.remarks : ""),
   })
 );

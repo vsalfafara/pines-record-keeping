@@ -70,7 +70,7 @@ export const lots = schema.table("lots", {
   lotType: lotTypes().notNull(),
   price: t.decimal().notNull(),
   remarks: t.varchar(),
-  taken: t.boolean().default(false),
+  taken: t.boolean().notNull().default(false),
   createdBy: t.varchar("created_by").notNull(),
   createdAt: t.date("created_at", { mode: "date" }).defaultNow().notNull(),
 });
