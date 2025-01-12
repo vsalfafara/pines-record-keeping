@@ -15,7 +15,8 @@
 <script setup lang="ts">
 import { VisuallyHidden } from "radix-vue";
 const { receipt } = defineProps<{ receipt: string }>();
+const config = useRuntimeConfig();
 const image = ref<string>(
-  `https://res.cloudinary.com/dreznpjkt/image/upload/v1736597556/${receipt}`
+  `https://res.cloudinary.com/${config.public.cloudinary.cloudName}/image/upload/v1736597556/${receipt}`
 );
 </script>
