@@ -132,10 +132,6 @@ import EditClientButton from "~/components/client-records/EditClientButton.vue";
 import type { Client } from "~/db/schema";
 import type { BreadcrumbType } from "~/lib/types";
 
-useHead({
-  title: "Property Porfolio",
-});
-
 const breadcrumbs = ref<BreadcrumbType[]>([
   {
     label: "Client Records",

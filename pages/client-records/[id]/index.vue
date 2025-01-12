@@ -293,10 +293,6 @@ import EditClientLotDialog from "@/components/client-records/client-lot/EditClie
 import type { Client, ClientLot } from "~/db/schema";
 import type { BreadcrumbType } from "~/lib/types";
 
-useHead({
-  title: "Property Porfolio",
-});
-
 onMounted(async () => {
   handleGetClient();
   columnVisibility.value = {

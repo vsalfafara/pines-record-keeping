@@ -266,10 +266,6 @@ import type { Block, Property } from "~/db/schema";
 import EditBlockDialog from "~/components/property-portfolio/block/EditBlockDialog.vue";
 import type { BreadcrumbType } from "~/lib/types";
 
-useHead({
-  title: "Property Porfolio",
-});
-
 const breadcrumbs = ref<BreadcrumbType[]>([
   {
     label: "Property Portfolio",

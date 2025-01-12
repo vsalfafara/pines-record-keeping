@@ -139,10 +139,6 @@ import EditPropertyButton from "~/components/property-portfolio/EditPropertyButt
 import { blockRelations, type Lot, type Property } from "~/db/schema";
 import type { BreadcrumbType } from "~/lib/types";
 
-useHead({
-  title: "Property Porfolio",
-});
-
 const breadcrumbs = ref<BreadcrumbType[]>([
   {
     label: "Property Portfolio",

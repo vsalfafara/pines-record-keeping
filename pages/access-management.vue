@@ -118,10 +118,6 @@ import EditUserDialog from "~/components/access-management/EditUserDialog.vue";
 import DeleteUserDialog from "~/components/access-management/DeleteUserDialog.vue";
 import type { BreadcrumbType } from "~/lib/types";
 
-useHead({
-  title: "Access Management",
-});
-
 const breadcrumbs = ref<BreadcrumbType[]>([
   {
     label: "Access Management",

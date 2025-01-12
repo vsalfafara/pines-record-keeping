@@ -84,10 +84,6 @@ definePageMeta({
   },
 });
 
-useHead({
-  title: "Pines Memorial - Login",
-});
-
 const { toast } = useToast();
 const loading = ref<boolean>(false);
 
