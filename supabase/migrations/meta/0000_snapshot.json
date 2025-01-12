@@ -1,12 +1,12 @@
 {
-  "id": "6cc25c6e-9c7f-4130-9248-a5402d6d9efd",
+  "id": "5d2f4aa2-f1de-48af-91ff-16416ebdb208",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "pines-dev.blocks": {
+    "public.blocks": {
       "name": "blocks",
-      "schema": "pines-dev",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -16,7 +16,7 @@
           "identity": {
             "type": "always",
             "name": "blocks_id_seq",
-            "schema": "pines-dev",
+            "schema": "public",
             "increment": "1",
             "startWith": "1",
             "minValue": "1",
@@ -58,9 +58,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "pines-dev.client_lots": {
+    "public.client_lots": {
       "name": "client_lots",
-      "schema": "pines-dev",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -70,7 +70,7 @@
           "identity": {
             "type": "always",
             "name": "client_lots_id_seq",
-            "schema": "pines-dev",
+            "schema": "public",
             "increment": "1",
             "startWith": "1",
             "minValue": "1",
@@ -209,9 +209,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "pines-dev.clients": {
+    "public.clients": {
       "name": "clients",
-      "schema": "pines-dev",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -221,7 +221,7 @@
           "identity": {
             "type": "always",
             "name": "clients_id_seq",
-            "schema": "pines-dev",
+            "schema": "public",
             "increment": "1",
             "startWith": "1",
             "minValue": "1",
@@ -293,9 +293,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "pines-dev.expenses": {
+    "public.expenses": {
       "name": "expenses",
-      "schema": "pines-dev",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -305,7 +305,7 @@
           "identity": {
             "type": "always",
             "name": "expenses_id_seq",
-            "schema": "pines-dev",
+            "schema": "public",
             "increment": "1",
             "startWith": "1",
             "minValue": "1",
@@ -372,9 +372,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "pines-dev.interments": {
+    "public.interments": {
       "name": "interments",
-      "schema": "pines-dev",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -384,7 +384,7 @@
           "identity": {
             "type": "always",
             "name": "interments_id_seq",
-            "schema": "pines-dev",
+            "schema": "public",
             "increment": "1",
             "startWith": "1",
             "minValue": "1",
@@ -493,9 +493,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "pines-dev.invoices": {
+    "public.invoices": {
       "name": "invoices",
-      "schema": "pines-dev",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -505,7 +505,7 @@
           "identity": {
             "type": "always",
             "name": "invoices_id_seq",
-            "schema": "pines-dev",
+            "schema": "public",
             "increment": "1",
             "startWith": "1",
             "minValue": "1",
@@ -572,9 +572,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "pines-dev.lots": {
+    "public.lots": {
       "name": "lots",
-      "schema": "pines-dev",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -584,7 +584,7 @@
           "identity": {
             "type": "always",
             "name": "lots_id_seq",
-            "schema": "pines-dev",
+            "schema": "public",
             "increment": "1",
             "startWith": "1",
             "minValue": "1",
@@ -652,9 +652,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "pines-dev.perpetual_cares": {
+    "public.perpetual_cares": {
       "name": "perpetual_cares",
-      "schema": "pines-dev",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -664,7 +664,7 @@
           "identity": {
             "type": "always",
             "name": "perpetual_cares_id_seq",
-            "schema": "pines-dev",
+            "schema": "public",
             "increment": "1",
             "startWith": "1",
             "minValue": "1",
@@ -706,9 +706,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "pines-dev.properties": {
+    "public.properties": {
       "name": "properties",
-      "schema": "pines-dev",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -718,7 +718,7 @@
           "identity": {
             "type": "always",
             "name": "properties_id_seq",
-            "schema": "pines-dev",
+            "schema": "public",
             "increment": "1",
             "startWith": "1",
             "minValue": "1",
@@ -760,9 +760,9 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "pines-dev.users": {
+    "public.users": {
       "name": "users",
-      "schema": "pines-dev",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
@@ -772,7 +772,7 @@
           "identity": {
             "type": "always",
             "name": "users_id_seq",
-            "schema": "pines-dev",
+            "schema": "public",
             "increment": "1",
             "startWith": "1",
             "minValue": "1",
@@ -899,9 +899,7 @@
       ]
     }
   },
-  "schemas": {
-    "pines-dev": "pines-dev"
-  },
+  "schemas": {},
   "sequences": {},
   "roles": {},
   "policies": {},

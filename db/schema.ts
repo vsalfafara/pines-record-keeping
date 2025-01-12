@@ -3,10 +3,6 @@ import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import * as t from "drizzle-orm/pg-core";
 import "dotenv/config";
 
-const schemaName: string = process.env.SCHEMA || "";
-
-export const schema = t.pgSchema(schemaName);
-
 export const roles = t.pgEnum("role", ["ADMIN", "ACCOUNTS_CLERK"]);
 
 export const lotTypes = t.pgEnum("lot_type", [
@@ -35,7 +31,7 @@ export const inNeed = t.pgEnum("in_need", ["Yes", "No"]);
 
 export const intermentTypes = t.pgEnum("type", ["Flesh", "Bone"]);
 
-export const users = schema.table("users", {
+export const users = t.pgTable("users", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   firstName: t.varchar("first_name").notNull(),
   lastName: t.varchar("last_name").notNull(),
@@ -47,7 +43,7 @@ export const users = schema.table("users", {
   createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
-export const properties = schema.table("properties", {
+export const properties = t.pgTable("properties", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   name: t.varchar("name").notNull(),
   fullAddress: t.varchar("full_address").notNull(),
@@ -55,7 +51,7 @@ export const properties = schema.table("properties", {
   createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
-export const blocks = schema.table("blocks", {
+export const blocks = t.pgTable("blocks", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   propertyId: t.integer("property_id"),
   name: t.varchar("name").notNull(),
@@ -63,7 +59,7 @@ export const blocks = schema.table("blocks", {
   createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
-export const lots = schema.table("lots", {
+export const lots = t.pgTable("lots", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   blockId: t.integer("block_id"),
   name: t.varchar("name").notNull(),
@@ -75,7 +71,7 @@ export const lots = schema.table("lots", {
   createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
-export const clients = schema.table("clients", {
+export const clients = t.pgTable("clients", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   firstName: t.varchar("first_name").notNull(),
   lastName: t.varchar("last_name").notNull(),
@@ -88,7 +84,7 @@ export const clients = schema.table("clients", {
   createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
-export const clientLots = schema.table("client_lots", {
+export const clientLots = t.pgTable("client_lots", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   clientId: t.integer("client_id").notNull(),
   propertyId: t.integer("property_id").notNull(),
@@ -112,7 +108,7 @@ export const clientLots = schema.table("client_lots", {
   createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
-export const interments = schema.table("interments", {
+export const interments = t.pgTable("interments", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   clientLotId: t.integer("client_lot_id").notNull(),
   dig: t.integer("dig"),
@@ -134,7 +130,7 @@ export const interments = schema.table("interments", {
     .notNull(),
 });
 
-export const perpetualCares = schema.table("perpetual_cares", {
+export const perpetualCares = t.pgTable("perpetual_cares", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   clientLotId: t.integer("client_lot_id").notNull(),
   installmentYears: t.varchar("installment_years"),
@@ -142,7 +138,7 @@ export const perpetualCares = schema.table("perpetual_cares", {
   paymentDue: t.integer("payment_due").notNull(),
 });
 
-export const invoices = schema.table("invoices", {
+export const invoices = t.pgTable("invoices", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   clientLotId: t.integer("client_lot_id").notNull(),
   purpose: invoicePurposes().notNull(),
@@ -154,7 +150,7 @@ export const invoices = schema.table("invoices", {
   createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
-export const expenses = schema.table("expenses", {
+export const expenses = t.pgTable("expenses", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   clientLotId: t.integer("client_lot_id").notNull(),
   purpose: expensesPurposes().notNull(),
