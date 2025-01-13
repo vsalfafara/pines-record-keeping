@@ -86,7 +86,7 @@
             />
           </div>
         </div>
-        <div class="max-h-[400px] overflow-y-auto rounded-md border">
+        <div class="max-h-[500px] overflow-y-auto rounded-md border">
           <Table class="whitespace-nowrap">
             <TableHeader>
               <TableRow
@@ -325,7 +325,7 @@ const table = useVueTable({
   data: lots,
   columns,
   getCoreRowModel: getCoreRowModel(),
-  getPaginationRowModel: getPaginationRowModel(),
+  // getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
   getExpandedRowModel: getExpandedRowModel(),
