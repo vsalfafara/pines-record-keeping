@@ -469,7 +469,7 @@ let baseSchema = z.object({
     message: "Please select a mode of payment",
   }),
   dateOfPayment: z.array(z.string(), {
-    message: "Please enter a birth date",
+    message: "Please enter a date",
   }),
   receipt: z.instanceof(File, { message: "Please upload a receipt" }),
   discount: z

@@ -31,6 +31,7 @@ const initiallyHiddenColumns = ref<VisibilityState>({
   remainsName: false,
   remainsBorn: false,
   remainsDied: false,
+  contractorMobileNumber: false,
 });
 
 onMounted(() => {

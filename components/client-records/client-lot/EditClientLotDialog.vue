@@ -4,7 +4,7 @@
       <SheetTrigger as-child>
         <Button variant="outline" size="icon"> <Pencil /> </Button>
       </SheetTrigger>
-      <SheetContent class="sm:max-w-[1240px]">
+      <SheetContent class="sm:max-w-full">
         <SheetHeader class="mb-4">
           <SheetTitle
             ><Pencil class="h-8 w-8 rounded-md bg-blue-50 p-2 text-blue-600"

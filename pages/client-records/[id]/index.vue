@@ -167,7 +167,7 @@
         </Card>
       </Form>
       <p class="font-semibold text-blue-600">Property Information</p>
-      <DataTable :data="clientLots" :columns :loading>
+      <DataTable :data="clientLots" :columns :loading :initiallyHiddenColumns>
         <template #buttons>
           <AddClientLotDialog
             v-if="client"
@@ -257,6 +257,12 @@ const formSchema = toTypedSchema(
 );
 
 const columnHelper = createColumnHelper<ClientLot>();
+const initiallyHiddenColumns = ref<VisibilityState>({
+  terms: false,
+  discount: false,
+  lotPrice: false,
+  balance: false,
+});
 
 const columns = [
   columnHelper.accessor("property.name", {

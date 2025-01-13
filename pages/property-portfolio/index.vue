@@ -10,7 +10,7 @@
     <p class="mb-4 text-muted-foreground">
       Here's a list of all your property ownings.
     </p>
-    <DataTable :data="properties" :columns :loading>
+    <DataTable :data="properties" :columns :loading :initiallyHiddenColumns>
       <template #buttons
         ><AddPropertyDialog @refresh="handleGetProperties"
       /></template>
@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
-import { createColumnHelper } from "@tanstack/vue-table";
+import { createColumnHelper, type VisibilityState } from "@tanstack/vue-table";
 import { ArrowUpDown } from "lucide-vue-next";
 import { useDateFormat } from "@vueuse/core";
 import DataTable from "~/components/custom/DataTable.vue";
@@ -50,6 +50,9 @@ const totalTakenLots = ref<number>(0);
 const loading = ref<boolean>(false);
 
 const columnHelper = createColumnHelper<CustomProperty>();
+const initiallyHiddenColumns = ref<VisibilityState>({
+  fullAddress: false,
+});
 
 const columns = [
   columnHelper.accessor("name", {
