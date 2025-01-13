@@ -35,7 +35,7 @@
     </div>
     <div
       class="overflow-y-auto rounded-md border"
-      :class="{ 'max-h-[400px]': fixedHeight }"
+      v-bind="{ class: tableSize }"
     >
       <Table class="whitespace-nowrap">
         <TableHeader>
@@ -107,14 +107,14 @@ const {
   data,
   columns,
   loading,
-  fixedHeight = false,
   initiallyHiddenColumns = {},
+  tableSize = "",
 } = defineProps<{
   data: any[];
   columns: any;
   loading: boolean;
-  fixedHeight?: boolean;
   initiallyHiddenColumns?: VisibilityState;
+  tableSize?: string;
 }>();
 
 const sorting = ref<SortingState>([]);

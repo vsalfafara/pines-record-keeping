@@ -4,7 +4,7 @@
     :columns
     :loading
     :initiallyHiddenColumns
-    fixed-height
+    table-size="max-h-[calc(100vh-500px)]"
   />
 </template>
 

@@ -1,5 +1,10 @@
 <template>
-  <DataTable :data="perpetualCares" :columns :loading fixed-height />
+  <DataTable
+    :data="perpetualCares"
+    :columns
+    :loading
+    table-size="max-h-[calc(100vh-500px)]"
+  />
 </template>
 
 <script setup lang="ts">

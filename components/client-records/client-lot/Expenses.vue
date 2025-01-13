@@ -1,5 +1,10 @@
 <template>
-  <DataTable :data="expenses" :columns :loading fixed-height>
+  <DataTable
+    :data="expenses"
+    :columns
+    :loading
+    table-size="max-h-[calc(100vh-500px)]"
+  >
     <template #buttons>
       <AddExpenseDialog :client-lot="clientLot" @refresh="handleGetExpenses" />
     </template>

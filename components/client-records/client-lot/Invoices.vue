@@ -1,5 +1,10 @@
 <template>
-  <DataTable :data="invoices" :columns :loading fixed-height>
+  <DataTable
+    :data="invoices"
+    :columns
+    :loading
+    table-size="max-h-[calc(100vh-500px)]"
+  >
     <template #buttons>
       <AddInvoiceDialog :client-lot="clientLot" @refresh="handleGetInvoices" />
     </template>

@@ -50,7 +50,12 @@
             </FormField>
           </form>
           <p class="font-semibold text-blue-600">Lots</p>
-          <DataTable :data="lots" :columns :loading fixed-height>
+          <DataTable
+            :data="lots"
+            :columns
+            :loading
+            table-size="max-h-[calc(100vh-350px)]"
+          >
             <template #buttons>
               <AddLotDialog
                 v-if="block"
