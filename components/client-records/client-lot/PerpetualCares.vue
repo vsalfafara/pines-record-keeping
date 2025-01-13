@@ -13,7 +13,6 @@ import { createColumnHelper } from "@tanstack/vue-table";
 import { ArrowUpDown } from "lucide-vue-next";
 import type { ClientLot, PerpetualCare } from "~/db/schema";
 import { useDateFormat } from "@vueuse/core";
-import { useCurrencyFormatter } from "#build/imports";
 import { Badge } from "~/components/ui/badge";
 import DataTable from "~/components/custom/DataTable.vue";
 
@@ -44,7 +43,7 @@ const columns = [
     cell: ({ row }) => {
       const status: string = row.getValue("status");
       const variant = status === "Paid" ? "success" : "pending";
-      return h(Badge, { variant }, status);
+      return h(Badge, { variant }, () => status);
     },
   }),
   columnHelper.accessor("installmentYears", {

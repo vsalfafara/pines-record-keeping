@@ -10,7 +10,13 @@
     <p class="mb-4 text-muted-foreground">
       Here's a list of all your property ownings.
     </p>
-    <DataTable :data="properties" :columns :loading :initiallyHiddenColumns>
+    <DataTable
+      :data="properties"
+      :columns
+      :loading
+      :initiallyHiddenColumns
+      table-size="max-h-[calc(100vh-220px)]"
+    >
       <template #buttons
         ><AddPropertyDialog @refresh="handleGetProperties"
       /></template>

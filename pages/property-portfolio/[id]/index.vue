@@ -139,7 +139,12 @@
         </Card>
       </Form>
       <p class="font-semibold text-blue-600">Blocks</p>
-      <DataTable :data="blocks" :columns :loading>
+      <DataTable
+        :data="blocks"
+        :columns
+        :loading
+        table-size="max-h-[calc(100vh-550px)]"
+      >
         <template #buttons>
           <AddBlockDialog
             v-if="property"

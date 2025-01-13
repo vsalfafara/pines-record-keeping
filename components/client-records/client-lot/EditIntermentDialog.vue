@@ -89,7 +89,7 @@
                   v-bind="componentField"
                   placeholder="Select Date"
                   :formatter="{
-                    date: 'YYYY-MM-DD',
+                    date: 'MM-DD-YYYY',
                     month: 'MMMM',
                   }"
                   as-single
@@ -105,7 +105,7 @@
                   v-bind="componentField"
                   placeholder="Select Date"
                   :formatter="{
-                    date: 'YYYY-MM-DD',
+                    date: 'MM-DD-YYYY',
                     month: 'MMMM',
                   }"
                   as-single
@@ -135,7 +135,7 @@
                   v-bind="componentField"
                   placeholder="Select Date"
                   :formatter="{
-                    date: 'YYYY-MM-DD',
+                    date: 'MM-DD-YYYY',
                     month: 'MMMM',
                   }"
                   as-single
@@ -152,7 +152,7 @@
                   v-bind="componentField"
                   placeholder="Select Date"
                   :formatter="{
-                    date: 'YYYY-MM-DD',
+                    date: 'MM-DD-YYYY',
                     month: 'MMMM',
                   }"
                   as-single
@@ -169,7 +169,7 @@
                   v-bind="componentField"
                   placeholder="Select Date"
                   :formatter="{
-                    date: 'YYYY-MM-DD',
+                    date: 'MM-DD-YYYY',
                     month: 'MMMM',
                   }"
                   as-single

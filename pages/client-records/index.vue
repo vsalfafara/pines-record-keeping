@@ -4,7 +4,12 @@
     <p class="mb-4 text-muted-foreground">
       Here's a list of all your client records.
     </p>
-    <DataTable :data="clients" :columns :loading>
+    <DataTable
+      :data="clients"
+      :columns
+      :loading
+      table-size="max-h-[calc(100vh-220px)]"
+    >
       <template #buttons>
         <AddClientDialog @refresh="handleGetClients" />
       </template>

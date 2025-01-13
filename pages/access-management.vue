@@ -4,7 +4,12 @@
     <p class="mb-4 text-muted-foreground">
       Here's a list of all your admin access.
     </p>
-    <DataTable :data="users" :columns :loading>
+    <DataTable
+      :data="users"
+      :columns
+      :loading
+      table-size="max-h-[calc(100vh-220px)]"
+    >
       <template #buttons><AddUserDialog @refresh="getUsers" /></template>
     </DataTable>
   </NuxtLayout>

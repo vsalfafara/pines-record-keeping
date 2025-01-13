@@ -6,9 +6,9 @@ import { perpetualCares } from "~/db/schema";
 export default defineEventHandler(async (event) => {
   try {
     const body: any = await readBody(event);
-    const { paymentDue, clientLotId } = body;
+    const { paymentDue, clientLotId, dateOfPayment } = body;
     const values = [];
-    const today = new Date();
+    const date = new Date(dateOfPayment);
 
     const hasRows = await db.query.perpetualCares.findFirst({
       where: eq(perpetualCares.clientLotId, parseInt(clientLotId)),
@@ -18,8 +18,8 @@ export default defineEventHandler(async (event) => {
 
     for (let x = 0; x <= 100; x += 10) {
       const installmentYears = new Date(
-        today.getFullYear() + x,
-        today.getMonth() + 1,
+        date.getFullYear() + x,
+        date.getMonth() + 1,
         0
       );
       values.push({

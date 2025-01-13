@@ -85,7 +85,7 @@
                   v-bind="componentField"
                   placeholder="Select Date"
                   :formatter="{
-                    date: 'YYYY-MM-DD',
+                    date: 'MM-DD-YYYY',
                     month: 'MMMM',
                   }"
                   as-single
@@ -442,7 +442,7 @@
                       v-bind="componentField"
                       placeholder="Select Date"
                       :formatter="{
-                        date: 'YYYY-MM-DD',
+                        date: 'MM-DD-YYYY',
                         month: 'MMMM',
                       }"
                       as-single
@@ -725,12 +725,11 @@ async function handleCreateClient(values: any) {
 
     const receipt = await handleUploadReceipt(values.receipt);
     body = {
+      ...values,
+      payment: values.actualPrice,
       clientLotId: response.clientLot.id,
       purpose: "Full Payment",
-      payment: values.actualPrice,
-      dateOfPayment: values.dateOfPayment,
       receipt,
-      remarks: values.remarks,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
       createdOn: useDateFormat(new Date(), "MM-DD-YYYY").value,
     };

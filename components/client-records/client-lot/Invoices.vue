@@ -42,7 +42,6 @@ import { useDateFormat } from "@vueuse/core";
 import { valueUpdater } from "~/lib/utils";
 import RemarksTooltip from "~/components/custom/RemarksTooltip.vue";
 import Receipt from "./Receipt.vue";
-import { useCurrencyFormatter } from "#build/imports";
 import AddInvoiceDialog from "./AddInvoiceDialog.vue";
 import DataTable from "~/components/custom/DataTable.vue";
 
@@ -85,6 +84,20 @@ const columns = [
     },
     cell: ({ row }) =>
       h("div", { class: "px-4" }, toPHP.value.format(row.getValue("payment"))),
+  }),
+  columnHelper.accessor("modeOfPayment", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Mode of Payment", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) =>
+      h("div", { class: "px-4" }, row.getValue("modeOfPayment")),
   }),
   columnHelper.accessor("dateOfPayment", {
     header: ({ column }) => {

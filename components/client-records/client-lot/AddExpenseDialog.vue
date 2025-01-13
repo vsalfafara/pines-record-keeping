@@ -278,12 +278,9 @@ async function handleCreateInvoice(values: any) {
     const sessionData = { id: null, ...user.value };
     const receipt = await handleUploadReceipt(values.receipt);
     const body = {
+      ...values,
       clientLotId: clientLot.id,
-      purpose: values.purpose,
-      payment: values.payment,
-      dateOfPayment: values.dateOfPayment,
       receipt,
-      remarks: values.remarks,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
       createdOn: useDateFormat(new Date(), "MM-DD-YYYY").value,
     };

@@ -81,7 +81,7 @@
                         v-bind="componentField"
                         placeholder="Select Date"
                         :formatter="{
-                          date: 'YYYY-MM-DD',
+                          date: 'MM-DD-YYYY',
                           month: 'MMMM',
                         }"
                         as-single
@@ -167,7 +167,13 @@
         </Card>
       </Form>
       <p class="font-semibold text-blue-600">Property Information</p>
-      <DataTable :data="clientLots" :columns :loading :initiallyHiddenColumns>
+      <DataTable
+        :data="clientLots"
+        :columns
+        :loading
+        :initiallyHiddenColumns
+        table-size="max-h-[calc(100vh-550px)]"
+      >
         <template #buttons>
           <AddClientLotDialog
             v-if="client"

@@ -31,6 +31,12 @@ export const inNeed = t.pgEnum("in_need", ["Yes", "No"]);
 
 export const intermentTypes = t.pgEnum("type", ["Flesh", "Bone"]);
 
+export const modeOfPayments = t.pgEnum("mode_of_payment", [
+  "Bank Transfer",
+  "Cash Payment",
+  "Check Payment",
+]);
+
 export const users = t.pgTable("users", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   firstName: t.varchar("first_name").notNull(),
@@ -96,7 +102,7 @@ export const clientLots = t.pgTable("client_lots", {
   inNeed: inNeed("in_need"),
   terms: t.integer("terms"),
   downpayment: t.varchar("downpayment"),
-  perpetualCarePrice: t.integer("perpetual_care_price"),
+  perpetualCarePrice: t.doublePrecision("perpetual_care_price"),
   discount: t.integer("discount"),
   monthsToPay: t.integer("months_to_pay"),
   monthly: t.integer("monthly"),
@@ -135,7 +141,7 @@ export const perpetualCares = t.pgTable("perpetual_cares", {
   clientLotId: t.integer("client_lot_id").notNull(),
   installmentYears: t.varchar("installment_years"),
   dueDate: t.date("due_date", { mode: "string" }).notNull(),
-  paymentDue: t.integer("payment_due").notNull(),
+  paymentDue: t.doublePrecision("payment_due").notNull(),
 });
 
 export const invoices = t.pgTable("invoices", {
@@ -143,6 +149,7 @@ export const invoices = t.pgTable("invoices", {
   clientLotId: t.integer("client_lot_id").notNull(),
   purpose: invoicePurposes().notNull(),
   payment: t.integer().notNull(),
+  modeOfPayment: modeOfPayments().notNull().default("Cash Payment"),
   dateOfPayment: t.date("date_of_payment", { mode: "string" }).notNull(),
   receipt: t.varchar("receipt").notNull(),
   remarks: t.varchar("remarks"),
@@ -155,6 +162,7 @@ export const expenses = t.pgTable("expenses", {
   clientLotId: t.integer("client_lot_id").notNull(),
   purpose: expensesPurposes().notNull(),
   payment: t.integer().notNull(),
+  modeOfPayment: modeOfPayments().notNull().default("Cash Payment"),
   dateOfPayment: t.date("date_of_payment", { mode: "string" }).notNull(),
   receipt: t.varchar("receipt").notNull(),
   remarks: t.varchar("remarks"),

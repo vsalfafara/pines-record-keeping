@@ -1,5 +1,5 @@
 <template>
-  <Form v-slot="{ handleSubmit }" :validation-schema="formSchema">
+  <Form>
     <Sheet :open="dialogState" @update:open="handleOpenDialog" @open="">
       <SheetTrigger as-child>
         <Button variant="outline" size="icon"> <Pencil /> </Button>
@@ -219,15 +219,13 @@
 <script setup lang="ts">
 import { Button } from "~/components/ui/button";
 import { Pencil } from "lucide-vue-next";
-import { toTypedSchema } from "@vee-validate/zod";
-import * as z from "zod";
-import { useToast } from "@/components/ui/toast/use-toast";
 import { useDateFormat } from "@vueuse/core";
 import Interments from "./Interments.vue";
 import PerpetualCares from "./PerpetualCares.vue";
 import Invoices from "./Invoices.vue";
 import Expenses from "./Expenses.vue";
-import type { ClientLot, Invoice } from "~/db/schema";
+import type { ClientLot } from "~/db/schema";
+import { Form } from "vee-validate";
 
 const { clientLotData } = defineProps<{
   clientLotData: ClientLot;
@@ -241,56 +239,15 @@ type Tab =
   | "expenses";
 
 const emit = defineEmits(["refresh"]);
-const { toast } = useToast();
 const toPHP = useCurrencyFormatter();
-const loading = ref<boolean>(false);
 const dialogState = ref<boolean>(false);
-const invoices = ref<Invoice[]>([]);
 const tab = ref<Tab | string | number>("payment-plan");
-
-let formSchema = generateTypedSchema();
 
 function handleOpenDialog(state: boolean) {
   dialogState.value = state;
-  if (state) {
-    formSchema = generateTypedSchema();
-  }
-}
-
-function generateTypedSchema() {
-  return toTypedSchema(
-    z.object({
-      name: z.string().min(1, { message: "Please enter a block name" }),
-      // .default(block.value.name),
-    })
-  );
 }
 
 function handleChangeTab(tabName: Tab | string | number) {
   tab.value = tabName;
-}
-
-async function handleUpdateClientLot(values: any) {
-  // loading.value = true;
-  // try {
-  //   const response: any = await $fetch(`/api/blocks/${block.value.id}`, {
-  //     method: "PUT",
-  //     body: { ...values },
-  //   });
-  //   toast({
-  //     title: "Success",
-  //     description: response.message,
-  //     variant: "success",
-  //   });
-  //   handleGetBlock();
-  // } catch (error: any) {
-  //   console.log(error.response);
-  //   toast({
-  //     title: "Error",
-  //     description: "Something went wrong.",
-  //     variant: "destructive",
-  //   });
-  // }
-  // loading.value = false;
 }
 </script>
