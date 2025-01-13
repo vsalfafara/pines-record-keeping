@@ -208,6 +208,33 @@ const columns = [
       const interment = row.original;
       const actions = [];
 
+      const format = "MM-DD-YYYY";
+      if (interment.deceasedBorn)
+        interment.deceasedBorn = useDateFormat(
+          interment.deceasedBorn,
+          format
+        ).value;
+      if (interment.deceasedDied)
+        interment.deceasedDied = useDateFormat(
+          interment.deceasedDied,
+          format
+        ).value;
+      if (interment.remainsBorn)
+        interment.remainsBorn = useDateFormat(
+          interment.remainsBorn,
+          format
+        ).value;
+      if (interment.remainsDied)
+        interment.remainsDied = useDateFormat(
+          interment.remainsDied,
+          format
+        ).value;
+      if (interment.intermentDate)
+        interment.intermentDate = useDateFormat(
+          interment.intermentDate,
+          format
+        ).value;
+
       actions.push(
         h(EditIntermentDialog, {
           interment,
