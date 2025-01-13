@@ -86,7 +86,7 @@
             />
           </div>
         </div>
-        <div class="rounded-md border">
+        <div class="max-h-[400px] overflow-y-auto rounded-md border">
           <Table class="whitespace-nowrap">
             <TableHeader>
               <TableRow
