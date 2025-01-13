@@ -591,7 +591,7 @@ async function handleCreateClient(values: any) {
         values.inNeed === "Yes" ? values.lotPrice * values.inNeedPrice : 0,
       clientId: clientId,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
-      createdOn: useDateFormat(new Date(), "YYYY-MM-DD").value,
+      createdOn: useDateFormat(new Date(), "MM-DD-YYYY").value,
     };
     let response: any = await $fetch("/api/client-lots/create", {
       method: "POST",
@@ -610,7 +610,7 @@ async function handleCreateClient(values: any) {
       receipt,
       remarks: values.remarks,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
-      createdOn: useDateFormat(new Date(), "YYYY-MM-DD").value,
+      createdOn: useDateFormat(new Date(), "MM-DD-YYYY").value,
     };
     await $fetch("/api/invoices/create", {
       method: "POST",

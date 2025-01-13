@@ -138,93 +138,16 @@
           </CardContent>
         </Card>
       </Form>
-      <div
-        class="flex flex-col items-end justify-between gap-2 lg:flex-row lg:items-center"
-      >
-        <p class="font-semibold text-blue-600">Blocks</p>
-        <div class="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button variant="outline">
-                <Settings2 />
-                Toggle Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuCheckboxItem
-                v-for="column in table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())"
-                :key="column.id"
-                class="cursor-pointer capitalize"
-                :checked="column.getIsVisible()"
-                @update:checked="
-                  (value: any) => {
-                    column.toggleVisibility(!!value);
-                  }
-                "
-              >
-                {{ column.id }}
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+      <p class="font-semibold text-blue-600">Blocks</p>
+      <DataTable :data="blocks" :columns :loading>
+        <template #buttons>
           <AddBlockDialog
             v-if="property"
             :property-id="property.id"
             @refresh="handleGetProperty"
           />
-        </div>
-      </div>
-      <div class="rounded-md border">
-        <Table class="whitespace-nowrap">
-          <TableHeader>
-            <TableRow
-              v-for="headerGroup in table.getHeaderGroups()"
-              :key="headerGroup.id"
-            >
-              <TableHead v-for="header in headerGroup.headers" :key="header.id">
-                <FlexRender
-                  v-if="!header.isPlaceholder"
-                  :render="header.column.columnDef.header"
-                  :props="header.getContext()"
-                />
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-if="loading">
-              <TableCell :colspan="columns.length" class="h-24">
-                <LoaderCircle class="mx-auto block h-4 w-4 animate-spin" />
-              </TableCell>
-            </TableRow>
-            <template v-else-if="table.getRowModel().rows?.length">
-              <template v-for="row in table.getRowModel().rows" :key="row.id">
-                <TableRow :data-state="row.getIsSelected() && 'selected'">
-                  <TableCell
-                    v-for="cell in row.getVisibleCells()"
-                    :key="cell.id"
-                  >
-                    <FlexRender
-                      :render="cell.column.columnDef.cell"
-                      :props="cell.getContext()"
-                    />
-                  </TableCell>
-                </TableRow>
-                <TableRow v-if="row.getIsExpanded()">
-                  <TableCell :colspan="row.getAllCells().length">
-                    {{ JSON.stringify(row.original) }}
-                  </TableCell>
-                </TableRow>
-              </template>
-            </template>
-            <TableRow v-else>
-              <TableCell :colspan="columns.length" class="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
+        </template>
+      </DataTable>
     </div>
   </NuxtLayout>
 </template>
@@ -261,10 +184,10 @@ import DeleteBlockDialog from "~/components/property-portfolio/block/DeleteBlock
 import { valueUpdater } from "~/lib/utils";
 import { useDateFormat } from "@vueuse/core";
 import { useToast } from "@/components/ui/toast/use-toast";
-
 import type { Block, Property } from "~/db/schema";
 import EditBlockDialog from "~/components/property-portfolio/block/EditBlockDialog.vue";
 import type { BreadcrumbType } from "~/lib/types";
+import DataTable from "~/components/custom/DataTable.vue";
 
 const breadcrumbs = ref<BreadcrumbType[]>([
   {
@@ -434,7 +357,7 @@ const table = useVueTable({
   data: blocks,
   columns,
   getCoreRowModel: getCoreRowModel(),
-  // getPaginationRowModel: getPaginationRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
   getExpandedRowModel: getExpandedRowModel(),

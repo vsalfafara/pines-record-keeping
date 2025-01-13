@@ -148,7 +148,7 @@ async function handleCreateLot(values: any) {
       ...values,
       blockId,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
-      createdOn: useDateFormat(new Date(), "YYYY-MM-DD").value,
+      createdOn: useDateFormat(new Date(), "MM-DD-YYYY").value,
     };
     const response: any = await $fetch("/api/lots/create", {
       method: "POST",

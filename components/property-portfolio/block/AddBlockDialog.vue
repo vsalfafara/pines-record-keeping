@@ -75,7 +75,7 @@ async function handleCreateBlock(values: any) {
       ...values,
       propertyId,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
-      createdOn: useDateFormat(new Date(), "YYYY-MM-DD").value,
+      createdOn: useDateFormat(new Date(), "MM-DD-YYYY").value,
     };
     const response: any = await $fetch("/api/blocks/create", {
       method: "POST",

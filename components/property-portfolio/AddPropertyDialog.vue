@@ -109,7 +109,7 @@ async function handleCreateProperty(values: any) {
     const body = {
       ...values,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
-      createdOn: useDateFormat(new Date(), "YYYY-MM-DD").value,
+      createdOn: useDateFormat(new Date(), "MM-DD-YYYY").value,
     };
     const response: any = await $fetch("/api/properties/create", {
       method: "POST",

@@ -4,119 +4,22 @@
     <p class="mb-4 text-muted-foreground">
       Here's a list of all your admin access.
     </p>
-    <div class="grid grid-cols-1 gap-2">
-      <div
-        class="flex flex-col items-end justify-between gap-2 lg:flex-row lg:items-center"
-      >
-        <Input placeholder="Search" class="max-w-[384px]" />
-        <div class="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button variant="outline">
-                <Settings2 />
-                Toggle Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuCheckboxItem
-                v-for="column in table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())"
-                :key="column.id"
-                class="cursor-pointer capitalize"
-                :checked="column.getIsVisible()"
-                @update:checked="
-                  (value: any) => {
-                    column.toggleVisibility(!!value);
-                  }
-                "
-              >
-                {{ column.id }}
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <AddUserDialog @refresh="getUsers" />
-        </div>
-      </div>
-      <div class="rounded-md border">
-        <Table class="whitespace-nowrap">
-          <TableHeader>
-            <TableRow
-              v-for="headerGroup in table.getHeaderGroups()"
-              :key="headerGroup.id"
-            >
-              <TableHead v-for="header in headerGroup.headers" :key="header.id">
-                <FlexRender
-                  v-if="!header.isPlaceholder"
-                  :render="header.column.columnDef.header"
-                  :props="header.getContext()"
-                />
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-if="loading">
-              <TableCell :colspan="columns.length" class="h-24">
-                <LoaderCircle class="mx-auto block h-4 w-4 animate-spin" />
-              </TableCell>
-            </TableRow>
-            <template v-else-if="table.getRowModel().rows?.length">
-              <template v-for="row in table.getRowModel().rows" :key="row.id">
-                <TableRow :data-state="row.getIsSelected() && 'selected'">
-                  <TableCell
-                    v-for="cell in row.getVisibleCells()"
-                    :key="cell.id"
-                  >
-                    <FlexRender
-                      :render="cell.column.columnDef.cell"
-                      :props="cell.getContext()"
-                    />
-                  </TableCell>
-                </TableRow>
-                <TableRow v-if="row.getIsExpanded()">
-                  <TableCell :colspan="row.getAllCells().length">
-                    {{ JSON.stringify(row.original) }}
-                  </TableCell>
-                </TableRow>
-              </template>
-            </template>
-            <TableRow v-else>
-              <TableCell :colspan="columns.length" class="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+    <DataTable :data="users" :columns :loading>
+      <template #buttons><AddUserDialog @refresh="getUsers" /></template>
+    </DataTable>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
-import type {
-  ColumnFiltersState,
-  ExpandedState,
-  SortingState,
-  VisibilityState,
-} from "@tanstack/vue-table";
-import {
-  createColumnHelper,
-  FlexRender,
-  getCoreRowModel,
-  getExpandedRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useVueTable,
-} from "@tanstack/vue-table";
-import { Settings2, ArrowUpDown, LoaderCircle } from "lucide-vue-next";
-import { valueUpdater } from "~/lib/utils";
+import { createColumnHelper } from "@tanstack/vue-table";
+import { ArrowUpDown } from "lucide-vue-next";
 import { useDateFormat } from "@vueuse/core";
 import AddUserDialog from "~/components/access-management/AddUserDialog.vue";
 import EditUserDialog from "~/components/access-management/EditUserDialog.vue";
 import DeleteUserDialog from "~/components/access-management/DeleteUserDialog.vue";
 import type { BreadcrumbType } from "~/lib/types";
+import DataTable from "~/components/custom/DataTable.vue";
 
 const breadcrumbs = ref<BreadcrumbType[]>([
   {
@@ -267,46 +170,13 @@ const columns = [
   }),
 ];
 
-const sorting = ref<SortingState>([]);
-const columnFilters = ref<ColumnFiltersState>([]);
-const columnVisibility = ref<VisibilityState>({});
-
-const table = useVueTable({
-  data: users,
-  columns,
-  getCoreRowModel: getCoreRowModel(),
-  // getPaginationRowModel: getPaginationRowModel(),
-  getSortedRowModel: getSortedRowModel(),
-  getFilteredRowModel: getFilteredRowModel(),
-  getExpandedRowModel: getExpandedRowModel(),
-  onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
-  onColumnFiltersChange: (updaterOrValue) =>
-    valueUpdater(updaterOrValue, columnFilters),
-  onColumnVisibilityChange: (updaterOrValue) =>
-    valueUpdater(updaterOrValue, columnVisibility),
-  state: {
-    get sorting() {
-      return sorting.value;
-    },
-    get columnFilters() {
-      return columnFilters.value;
-    },
-    get columnVisibility() {
-      return columnVisibility.value;
-    },
-    columnPinning: {
-      left: ["status"],
-    },
-  },
-});
-
 onMounted(async () => getUsers());
 
 async function getUsers() {
   loading.value = true;
   try {
-    const data = await $fetch("/api/users/all");
-    users.value = data as any;
+    const data: any = await $fetch("/api/users/all");
+    users.value = data;
   } catch (error) {
     console.log(error);
   }
