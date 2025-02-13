@@ -114,6 +114,14 @@ export const clientLots = t.pgTable("client_lots", {
   createdOn: t.date("created_on", { mode: "string" }).notNull(),
 });
 
+export const paymentPlans = t.pgTable("payment_plans", {
+  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  clientLotId: t.integer("client_lot_id").notNull(),
+  installmentMonths: t.varchar("installment_months"),
+  dueDate: t.date("due_date", { mode: "string" }).notNull(),
+  paymentDue: t.doublePrecision("payment_due").notNull(),
+});
+
 export const interments = t.pgTable("interments", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   clientLotId: t.integer("client_lot_id").notNull(),
@@ -130,10 +138,7 @@ export const interments = t.pgTable("interments", {
   contractorName: t.varchar("contractor_name"),
   contractorMobileNumber: t.varchar("contractor_mobile_number"),
   lastModifiedBy: t.varchar("created_by"),
-  lastModifiedAt: t
-    .date("created_on", { mode: "string" })
-
-    .notNull(),
+  lastModifiedAt: t.date("created_on", { mode: "string" }).notNull(),
 });
 
 export const perpetualCares = t.pgTable("perpetual_cares", {
@@ -274,6 +279,9 @@ export type NewClientLot = InferInsertModel<typeof clientLots>;
 
 export type Invoice = InferSelectModel<typeof invoices>;
 export type NewInvoice = InferInsertModel<typeof invoices>;
+
+export type PaymentPlan = InferSelectModel<typeof paymentPlans>;
+export type NewPaymentPlan = InferInsertModel<typeof paymentPlans>;
 
 export type PerpetualCare = InferSelectModel<typeof perpetualCares>;
 export type NewPerpetualCare = InferInsertModel<typeof perpetualCares>;

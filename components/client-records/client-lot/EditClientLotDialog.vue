@@ -190,14 +190,16 @@
         <Tabs default-value="account" @update:model-value="handleChangeTab">
           <div class="flex justify-between">
             <TabsList>
-              <!-- <TabsTrigger value="payment-plan"> Payment Plan </TabsTrigger> -->
+              <TabsTrigger value="payment-plan"> Payment Plan </TabsTrigger>
               <TabsTrigger value="interment"> Interment </TabsTrigger>
               <TabsTrigger value="perpetual-care"> Perpetual Care </TabsTrigger>
               <TabsTrigger value="invoices"> Invoices </TabsTrigger>
               <TabsTrigger value="expenses"> Expenses </TabsTrigger>
             </TabsList>
           </div>
-          <!-- <TabsContent value="payment-plan"> <p>No content yet</p></TabsContent> -->
+          <TabsContent value="payment-plan">
+            <PaymentPlans :client-lot="clientLotData" />
+          </TabsContent>
           <TabsContent value="interment">
             <Interments :client-lot="clientLotData"
           /></TabsContent>
@@ -226,6 +228,7 @@ import Invoices from "./Invoices.vue";
 import Expenses from "./Expenses.vue";
 import type { ClientLot } from "~/db/schema";
 import { Form } from "vee-validate";
+import PaymentPlans from "./PaymentPlans.vue";
 
 const { clientLotData } = defineProps<{
   clientLotData: ClientLot;

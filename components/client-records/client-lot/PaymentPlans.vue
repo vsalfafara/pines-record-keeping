@@ -1,6 +1,6 @@
 <template>
   <DataTable
-    :data="perpetualCares"
+    :data="paymentPlans"
     :columns
     :loading
     table-size="max-h-[calc(100vh-500px)]"
@@ -11,22 +11,22 @@
 import { Button } from "@/components/ui/button";
 import { createColumnHelper } from "@tanstack/vue-table";
 import { ArrowUpDown } from "lucide-vue-next";
-import type { ClientLot, PerpetualCare } from "~/db/schema";
+import type { ClientLot, PaymentPlan } from "~/db/schema";
 import { useDateFormat } from "@vueuse/core";
 import { Badge } from "~/components/ui/badge";
 import DataTable from "~/components/custom/DataTable.vue";
 
 const { clientLot } = defineProps<{ clientLot: ClientLot }>();
 
-type CustomPerpetualCare = PerpetualCare & { status: string; paid: number };
+type CustomPaymentPlan = PaymentPlan & { status: string; paid: number };
 
 const toPHP = useCurrencyFormatter();
 const loading = ref<boolean>(false);
-const perpetualCares = ref<CustomPerpetualCare[]>([]);
+const paymentPlans = ref<CustomPaymentPlan[]>([]);
 
-const columnHelper = createColumnHelper<CustomPerpetualCare>();
+const columnHelper = createColumnHelper<CustomPaymentPlan>();
 
-onMounted(() => handleGetPerpetualCares());
+onMounted(() => handleGetPaymentPlans());
 
 const columns = [
   columnHelper.accessor("status", {
@@ -46,7 +46,7 @@ const columns = [
       return h(Badge, { variant }, () => status);
     },
   }),
-  columnHelper.accessor("installmentYears", {
+  columnHelper.accessor("installmentMonths", {
     header: ({ column }) => {
       return h(
         Button,
@@ -54,11 +54,15 @@ const columns = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Installment Years", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+        () => ["Installment Months", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) =>
-      h("div", { class: "px-4" }, row.getValue("installmentYears")),
+      h(
+        "div",
+        { class: "px-4" },
+        `${row.getValue("installmentMonths")} Months`
+      ),
   }),
   columnHelper.accessor("dueDate", {
     header: ({ column }) => {
@@ -113,11 +117,11 @@ const columns = [
   }),
 ];
 
-async function handleGetPerpetualCares() {
+async function handleGetPaymentPlans() {
   loading.value = true;
   try {
-    const response: any = await $fetch(`/api/perpetual-cares/${clientLot.id}`);
-    perpetualCares.value = response;
+    const response: any = await $fetch(`/api/payment-plans/${clientLot.id}`);
+    paymentPlans.value = response;
   } catch (error) {
     console.log(error);
   }

@@ -154,6 +154,17 @@
                 <RadioGroup
                   class="flex flex-col space-y-1"
                   v-bind="componentField"
+                  @update:model-value="
+                    () => {
+                      const lot = lots.find(
+                        (lot) => lot.id === parseInt(values.lotId)
+                      );
+                      if (lot) {
+                        setFieldValue('lotPrice', lot.price);
+                        setFieldValue('actualPrice', lot.price);
+                      }
+                    }
+                  "
                 >
                   <FormItem
                     v-for="paymentType in paymentTypes"
@@ -172,6 +183,89 @@
               <FormMessage />
             </FormItem>
           </FormField>
+          <template v-if="values.paymentType === 'Monthly Terms'">
+            <FormField v-slot="{ componentField }" name="paymentPlan">
+              <FormItem class="col-span-2">
+                <FormLabel>Select Payment Plan *</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    class="flex flex-col space-y-1"
+                    v-bind="componentField"
+                  >
+                    <FormItem
+                      v-for="paymentPlan in paymentPlans"
+                      :key="paymentPlan"
+                      class="flex items-center gap-x-3 space-y-0"
+                    >
+                      <FormControl>
+                        <RadioGroupItem :value="paymentPlan" />
+                      </FormControl>
+                      <FormLabel class="font-normal">
+                        {{ paymentPlan }}
+                      </FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <template
+              v-if="
+                ['Downpayment and Installment (with interest)'].includes(
+                  values.paymentPlan
+                )
+              "
+            >
+              <FormField v-slot="{ componentField }" name="terms">
+                <FormItem>
+                  <FormLabel>Terms *</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a term" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem
+                          v-for="term in terms"
+                          :key="term"
+                          :value="term.toString()"
+                        >
+                          {{ term }} Years
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="downpayment">
+                <FormItem>
+                  <FormLabel>Downpayment *</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a percentage" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem
+                          v-for="down in downpayment"
+                          :key="down"
+                          :value="down.toString()"
+                        >
+                          {{ down * 100 }}%
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+            </template>
+          </template>
           <template v-if="values.paymentType === 'Full Payment'">
             <FormField v-slot="{ componentField }" name="inNeed">
               <FormItem class="col-span-2">
@@ -239,167 +333,167 @@
                 </FormItem>
               </FormField>
             </template>
-            <template v-if="values.inNeed">
-              <FormField v-slot="{ componentField }" name="discount">
-                <FormItem :class="{ 'col-span-2': values.inNeed === 'No' }">
-                  <FormLabel>Discount</FormLabel>
-                  <FormControl>
-                    <div class="relative flex items-center">
-                      <Input
-                        class="pl-6"
-                        type="number"
-                        placeholder="0.00"
-                        default-value="0"
-                        v-bind="componentField"
-                        @update:model-value="
-                          (v: any) => {
-                            let actualPrice = values.lotPrice;
-                            if (values.inNeed === 'Yes') {
-                              if (values.inNeedPrice)
-                                actualPrice =
-                                  actualPrice +
-                                  actualPrice * parseFloat(values.inNeedPrice);
-                            }
-                            actualPrice -= v;
-                            setFieldValue('actualPrice', actualPrice);
-                          }
-                        "
-                      />
-                      <span class="absolute pl-3"> ₱ </span>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-              <FormField v-slot="{ componentField }" name="lotPrice">
-                <FormItem>
-                  <FormLabel>Lot Price</FormLabel>
-                  <FormControl>
-                    <div class="relative flex items-center">
-                      <Input
-                        class="pl-6"
-                        type="number"
-                        :placeholder="values.lotPrice"
-                        v-bind="componentField"
-                        disabled
-                      />
-                      <span class="absolute pl-3"> ₱ </span>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-              <FormField v-slot="{ componentField }" name="actualPrice">
-                <FormItem>
-                  <FormLabel>Actual Price</FormLabel>
-                  <FormControl>
-                    <div class="relative flex items-center">
-                      <Input
-                        class="pl-6"
-                        type="number"
-                        :placeholder="values.actualPrice"
-                        v-bind="componentField"
-                        disabled
-                      />
-                      <span class="absolute pl-3"> ₱ </span>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-              <FormField v-slot="{ componentField }" name="modeOfPayment">
-                <FormItem>
-                  <FormLabel>Mode Of Payment *</FormLabel>
-                  <Select v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a mode of payment" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem
-                          v-for="mode in modeOfPayment"
-                          :key="mode"
-                          :value="mode"
-                        >
-                          {{ mode }}
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-              <FormField v-slot="{ componentField }" name="dateOfPayment">
-                <FormItem>
-                  <FormLabel>Date of Payment *</FormLabel>
-                  <FormControl>
-                    <VueTailwindDatepicker
+          </template>
+          <template v-if="values.inNeed || values.paymentPlan">
+            <FormField v-slot="{ componentField }" name="discount">
+              <FormItem :class="{ 'col-span-2': values.inNeed === 'No' }">
+                <FormLabel>Discount</FormLabel>
+                <FormControl>
+                  <div class="relative flex items-center">
+                    <Input
+                      class="pl-6"
+                      type="number"
+                      placeholder="0.00"
+                      default-value="0"
                       v-bind="componentField"
-                      placeholder="Select Date"
-                      :formatter="{
-                        date: 'MM-DD-YYYY',
-                        month: 'MMMM',
-                      }"
-                      as-single
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-              <FormField name="receipt">
-                <FormItem class="col-span-2">
-                  <FormLabel>Receipt *</FormLabel>
-                  <FormControl>
-                    <Card
-                      class="flex h-[150px] cursor-pointer flex-col items-center justify-center gap-1 p-4"
-                      @click="
-                        () => {
-                          open();
-                          onChange((file) => {
-                            if (file) {
-                              setFieldValue('receipt', file[0]);
-                            }
-                          });
+                      @update:model-value="
+                        (v: any) => {
+                          let actualPrice = values.lotPrice;
+                          if (values.inNeed === 'Yes') {
+                            if (values.inNeedPrice)
+                              actualPrice =
+                                actualPrice +
+                                actualPrice * parseFloat(values.inNeedPrice);
+                          }
+                          actualPrice -= v;
+                          setFieldValue('actualPrice', actualPrice);
                         }
                       "
-                    >
-                      <CloudUpload
-                        class="h-8 w-8 rounded-full bg-blue-50 p-2 text-blue-500"
-                      />
-                      <template v-if="!values.receipt">
-                        <p class="text-xs">
-                          <span class="text-blue-500">Click to upload</span>
-                          (5mb)
-                        </p>
-                        <p class="text-xs">PNG, JPG, JPEG files only</p>
-                      </template>
-                      <template v-else>
-                        <p class="text-xs">
-                          <span class="text-blue-500">To upload:</span>
-                          {{ values.receipt.name }}
-                        </p>
-                      </template>
-                    </Card>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-              <FormField v-slot="{ componentField }" name="remarks">
-                <FormItem class="col-span-2">
-                  <FormLabel>Remarks</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      class="resize-none"
-                      placeholder="Enter a comment"
-                      v-bind="componentField"
                     />
+                    <span class="absolute pl-3"> ₱ </span>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="lotPrice">
+              <FormItem>
+                <FormLabel>Lot Price</FormLabel>
+                <FormControl>
+                  <div class="relative flex items-center">
+                    <Input
+                      class="pl-6"
+                      type="number"
+                      :placeholder="values.lotPrice"
+                      v-bind="componentField"
+                      disabled
+                    />
+                    <span class="absolute pl-3"> ₱ </span>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="actualPrice">
+              <FormItem>
+                <FormLabel>Actual Price</FormLabel>
+                <FormControl>
+                  <div class="relative flex items-center">
+                    <Input
+                      class="pl-6"
+                      type="number"
+                      :placeholder="values.actualPrice"
+                      v-bind="componentField"
+                      disabled
+                    />
+                    <span class="absolute pl-3"> ₱ </span>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="modeOfPayment">
+              <FormItem>
+                <FormLabel>Mode Of Payment *</FormLabel>
+                <Select v-bind="componentField">
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a mode of payment" />
+                    </SelectTrigger>
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-            </template>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="mode in modeOfPayment"
+                        :key="mode"
+                        :value="mode"
+                      >
+                        {{ mode }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="dateOfPayment">
+              <FormItem>
+                <FormLabel>Date of Payment *</FormLabel>
+                <FormControl>
+                  <VueTailwindDatepicker
+                    v-bind="componentField"
+                    placeholder="Select Date"
+                    :formatter="{
+                      date: 'MM-DD-YYYY',
+                      month: 'MMMM',
+                    }"
+                    as-single
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField name="receipt">
+              <FormItem class="col-span-2">
+                <FormLabel>Receipt *</FormLabel>
+                <FormControl>
+                  <Card
+                    class="flex h-[150px] cursor-pointer flex-col items-center justify-center gap-1 p-4"
+                    @click="
+                      () => {
+                        open();
+                        onChange((file) => {
+                          if (file) {
+                            setFieldValue('receipt', file[0]);
+                          }
+                        });
+                      }
+                    "
+                  >
+                    <CloudUpload
+                      class="h-8 w-8 rounded-full bg-blue-50 p-2 text-blue-500"
+                    />
+                    <template v-if="!values.receipt">
+                      <p class="text-xs">
+                        <span class="text-blue-500">Click to upload</span>
+                        (5mb)
+                      </p>
+                      <p class="text-xs">PNG, JPG, JPEG files only</p>
+                    </template>
+                    <template v-else>
+                      <p class="text-xs">
+                        <span class="text-blue-500">To upload:</span>
+                        {{ values.receipt.name }}
+                      </p>
+                    </template>
+                  </Card>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="remarks">
+              <FormItem class="col-span-2">
+                <FormLabel>Remarks</FormLabel>
+                <FormControl>
+                  <Textarea
+                    class="resize-none"
+                    placeholder="Enter a comment"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
           </template>
         </form>
         <DialogFooter>
@@ -438,18 +532,21 @@ const dialogState = ref<boolean>(false);
 const properties = ref<Property[]>([]);
 const blocks = ref<any>([]);
 const lots = ref<Lot[]>([]);
-
 const paymentTypes = ref<string[]>([
   // "Reservation",
-  // "Monthly Terms",
+  "Monthly Terms",
   "Full Payment",
 ]);
 
 const paymentPlans = ref<string[]>([
   "Downpayment and Installment (with interest)",
-  "Downpayment and Installment (without interest)",
-  "Installment only (with interest)",
+  // "Downpayment and Installment (without interest)",
+  // "Installment only (with interest)",
 ]);
+
+const terms = ref<number[]>([1, 2, 3, 4, 5]);
+
+const downpayment = ref<number[]>([0.1, 0.2, 0.3, 0.4, 0.5]);
 
 const modeOfPayment = ref<string[]>([
   "Bank Transfer",
@@ -457,7 +554,7 @@ const modeOfPayment = ref<string[]>([
   "Check Payment",
 ]);
 
-let baseSchema = z.object({
+const baseSchema = z.object({
   propertyId: z.string().min(1, { message: "Please select a property" }),
   blockId: z.string().min(1, { message: "Please select a block" }),
   lotId: z.string().min(1, { message: "Please select a lot" }),
@@ -480,22 +577,67 @@ let baseSchema = z.object({
     .or(z.literal(0)),
   actualPrice: z.number().multipleOf(0.01),
   remarks: z.string().optional(),
+  terms: z.any().pipe(z.coerce.number()).optional(),
+  downpayment: z.any().pipe(z.coerce.number()).optional(),
 });
 
-let inNeedSchema = z.object({
+const monthlyTermsSchema = z.object({
+  paymentType: z.literal("Monthly Terms"),
+  paymentPlan: z.enum([
+    "Downpayment and Installment (with interest)",
+    "Downpayment and Installment (without interest)",
+    "Installment only (with interest)",
+  ]),
+});
+
+const downpaymentAndInstallmentWithInterestSchema = z.object({
+  paymentPlan: z.literal("Downpayment and Installment (with interest)"),
+  terms: z.enum(["1", "2", "3", "4", "5"]).pipe(z.coerce.number()),
+  downpayment: z
+    .enum(["0.1", "0.2", "0.3", "0.4", "0.5"])
+    .pipe(z.coerce.number()),
+});
+
+const downpaymentAndInstallmentWithoutInterestSchema = z.object({
+  paymentPlan: z.literal("Downpayment and Installment (without interest)"),
+  terms: z.enum(["1", "2", "3", "4", "5"]).pipe(z.coerce.number()).optional(),
+  downpayment: z
+    .enum(["0.3", "0.4", "0.5", "0.6", "0.7", "0.8"])
+    .pipe(z.coerce.number()),
+});
+
+const monthlyTermsFormSchema = z
+  .discriminatedUnion("paymentPlan", [
+    downpaymentAndInstallmentWithInterestSchema,
+    downpaymentAndInstallmentWithoutInterestSchema,
+  ])
+  .and(baseSchema);
+
+const fullPaymentSchema = z.object({
+  paymentType: z.literal("Full Payment"),
+  inNeed: z.enum(["Yes", "No"]),
+});
+
+const inNeedSchema = z.object({
   inNeed: z.literal("Yes"),
   inNeedPrice: z.string({ message: "Please select an option" }),
 });
 
-let notInNeedSchema = z.object({
+const notInNeedSchema = z.object({
   inNeed: z.literal("No"),
   inNeedPrice: z.string({ message: "Please select an option" }).optional(),
 });
 
-let formSchema = toTypedSchema(
-  z
-    .discriminatedUnion("inNeed", [inNeedSchema, notInNeedSchema])
-    .and(baseSchema)
+const inNeedFormSchema = z
+  .discriminatedUnion("inNeed", [inNeedSchema, notInNeedSchema])
+  .and(baseSchema);
+
+const paymentTypeFormSchema = z
+  .discriminatedUnion("paymentType", [monthlyTermsSchema, fullPaymentSchema])
+  .and(baseSchema);
+
+const formSchema = toTypedSchema(
+  z.union([paymentTypeFormSchema, monthlyTermsFormSchema, inNeedFormSchema])
 );
 
 onMounted(async () => handleGetProperties());
@@ -615,6 +757,20 @@ async function handleCreateClient(values: any) {
       method: "POST",
       body,
     });
+
+    if (values.paymentType === "Monthly Terms") {
+      await $fetch("/api/payment-plans/create", {
+        method: "POST",
+        body: {
+          downpayment: values.downpayment,
+          price: values.actualPrice,
+          clientLotId: response.clientLot.id,
+          dateOfPayment: values.dateOfPayment,
+          terms: values.terms,
+        },
+      });
+    }
+
     toast({
       title: "Success",
       description: response.message,
