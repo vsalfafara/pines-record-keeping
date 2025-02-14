@@ -31,6 +31,8 @@ export default defineEventHandler(async (event) => {
       if (balance >= 0) {
         status = "Paid";
         paid = data.paymentDue;
+      } else {
+        paid = balance + data.paymentDue > 0 ? balance + data.paymentDue : 0;
       }
 
       return {

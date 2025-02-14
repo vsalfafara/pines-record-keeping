@@ -312,62 +312,140 @@
                 <FormMessage />
               </FormItem>
             </FormField>
-            <template
+            <FormField
               v-if="
-                ['Downpayment and Installment (with interest)'].includes(
-                  values.paymentPlan
-                )
+                [
+                  'Downpayment and Installment (with interest)',
+                  'Installment only (with interest)',
+                ].includes(values.paymentPlan)
               "
+              v-slot="{ componentField }"
+              name="terms"
             >
-              <FormField v-slot="{ componentField }" name="terms">
-                <FormItem>
-                  <FormLabel>Terms *</FormLabel>
-                  <Select v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a term" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem
-                          v-for="term in terms"
-                          :key="term"
-                          :value="term.toString()"
-                        >
-                          {{ term }} Years
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-              <FormField v-slot="{ componentField }" name="downpayment">
-                <FormItem>
-                  <FormLabel>Downpayment *</FormLabel>
-                  <Select v-bind="componentField">
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a percentage" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem
-                          v-for="down in downpayment"
-                          :key="down"
-                          :value="down.toString()"
-                        >
-                          {{ down * 100 }}%
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-            </template>
+              <FormItem>
+                <FormLabel>Terms *</FormLabel>
+                <Select
+                  v-bind="componentField"
+                  @update:model-value="
+                    () => {
+                      setFieldValue(
+                        'monthly',
+                        Math.round(
+                          (handleCalculateMonthly({
+                            ...values,
+                          }) +
+                            Number.EPSILON) *
+                            100
+                        ) / 100
+                      );
+                      setFieldValue(
+                        'totalInterest',
+                        handleCalculateTotalInterest(values)
+                      );
+                    }
+                  "
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a term" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="term in terms"
+                        :key="term"
+                        :value="term.toString()"
+                      >
+                        {{ term }} Months
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField
+              v-if="
+                [
+                  'Downpayment and Installment (with interest)',
+                  'Downpayment and Installment (without interest)',
+                ].includes(values.paymentPlan)
+              "
+              v-slot="{ componentField }"
+              name="downpayment"
+            >
+              <FormItem>
+                <FormLabel>Downpayment *</FormLabel>
+                <Select
+                  v-bind="componentField"
+                  @update:model-value="
+                    (v: any) => {
+                      setFieldValue(
+                        'monthly',
+                        Math.round(
+                          (handleCalculateMonthly({
+                            ...values,
+                          }) +
+                            Number.EPSILON) *
+                            100
+                        ) / 100
+                      );
+                      setFieldValue(
+                        'totalInterest',
+                        handleCalculateTotalInterest(values)
+                      );
+                      setFieldValue(
+                        'downpaymentPrice',
+                        values.actualPrice * Number(v)
+                      );
+                    }
+                  "
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a percentage" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="down in values.paymentPlan ===
+                        'Downpayment and Installment (with interest)'
+                          ? downpaymentWithInterest
+                          : downpaymentWithoutInterest"
+                        :key="down"
+                        :value="down.toString()"
+                      >
+                        {{ down * 100 }}%
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField
+              v-if="
+                values.paymentPlan ===
+                'Downpayment with Installment (without interest)'
+              "
+              v-slot="{ componentField }"
+              name="terms"
+            >
+              <FormItem>
+                <FormLabel>Months to Pay</FormLabel>
+                <FormControl>
+                  <Input
+                    class="pl-6"
+                    type="text"
+                    :placeholder="values.terms"
+                    v-bind="componentField"
+                    disabled
+                  />
+                </FormControl>
+              </FormItem>
+            </FormField>
           </template>
           <template v-if="values.paymentType === 'Full Payment'">
             <FormField v-slot="{ componentField }" name="inNeed">
@@ -439,7 +517,11 @@
           </template>
           <template v-if="values.inNeed || values.paymentPlan">
             <FormField v-slot="{ componentField }" name="discount">
-              <FormItem :class="{ 'col-span-2': values.inNeed === 'No' }">
+              <FormItem
+                :class="{
+                  'col-span-2': values.inNeed === 'No',
+                }"
+              >
                 <FormLabel>Discount</FormLabel>
                 <FormControl>
                   <div class="relative flex items-center">
@@ -460,6 +542,28 @@
                           }
                           actualPrice -= v;
                           setFieldValue('actualPrice', actualPrice);
+                          setFieldValue(
+                            'monthly',
+                            Math.round(
+                              (handleCalculateMonthly({
+                                ...values,
+                                actualPrice,
+                              }) +
+                                Number.EPSILON) *
+                                100
+                            ) / 100
+                          );
+                          setFieldValue(
+                            'totalInterest',
+                            handleCalculateTotalInterest({
+                              ...values,
+                              actualPrice,
+                            })
+                          );
+                          setFieldValue(
+                            'downpaymentPrice',
+                            values.actualPrice * Number(values.downpayment)
+                          );
                         }
                       "
                     />
@@ -469,6 +573,59 @@
                 <FormMessage />
               </FormItem>
             </FormField>
+            <FormField v-slot="{ componentField }" name="downpaymentPrice">
+              <FormItem>
+                <FormLabel>Downpayment Price</FormLabel>
+                <FormControl>
+                  <div class="relative flex items-center">
+                    <Input
+                      class="pl-6"
+                      type="number"
+                      :placeholder="values.downpaymentPrice"
+                      v-bind="componentField"
+                      disabled
+                    />
+                    <span class="absolute pl-3"> ₱ </span>
+                  </div>
+                </FormControl>
+              </FormItem>
+            </FormField>
+            <template v-if="values.paymentType === 'Monthly Terms'">
+              <FormField v-slot="{ componentField }" name="monthly">
+                <FormItem>
+                  <FormLabel> Monthly </FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        :placeholder="values.monthly"
+                        v-bind="componentField"
+                        disabled
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
+              <FormField v-slot="{ componentField }" name="totalInterest">
+                <FormItem>
+                  <FormLabel> Total Interest </FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        :placeholder="values.totalInterest"
+                        v-bind="componentField"
+                        disabled
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              </FormField>
+            </template>
             <FormField v-slot="{ componentField }" name="lotPrice">
               <FormItem>
                 <FormLabel>Lot Price</FormLabel>
@@ -634,6 +791,14 @@ const properties = ref<Property[]>([]);
 const blocks = ref<any>([]);
 const lots = ref<Lot[]>([]);
 
+const withInterestFactors = {
+  12: 0.091684,
+  24: 0.049934,
+  36: 0.036152,
+  48: 0.029375,
+  60: 0.025393,
+};
+
 const paymentTypes = ref<string[]>([
   // "Reservation",
   "Monthly Terms",
@@ -642,13 +807,16 @@ const paymentTypes = ref<string[]>([
 
 const paymentPlans = ref<string[]>([
   "Downpayment and Installment (with interest)",
-  // "Downpayment and Installment (without interest)",
+  "Downpayment and Installment (without interest)",
   // "Installment only (with interest)",
 ]);
 
-const terms = ref<number[]>([1, 2, 3, 4, 5]);
+const terms = ref<number[]>([12, 24, 36, 48, 60]);
 
-const downpayment = ref<number[]>([0.1, 0.2, 0.3, 0.4, 0.5]);
+const downpaymentWithInterest = ref<number[]>([0.1, 0.2, 0.3, 0.4, 0.5]);
+const downpaymentWithoutInterest = ref<number[]>([
+  0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
+]);
 
 const modeOfPayment = ref<string[]>([
   "Bank Transfer",
@@ -688,6 +856,9 @@ const baseSchema = z.object({
   remarks: z.string().optional(),
   terms: z.any().pipe(z.coerce.number()).optional(),
   downpayment: z.any().pipe(z.coerce.number()).optional(),
+  downpaymentPrice: z.number().multipleOf(0.01).optional().default(0),
+  totalInterest: z.number().multipleOf(0.01).optional().default(0),
+  monthly: z.number().multipleOf(0.01).optional().default(0),
 });
 
 const monthlyTermsSchema = z.object({
@@ -697,11 +868,12 @@ const monthlyTermsSchema = z.object({
     "Downpayment and Installment (without interest)",
     "Installment only (with interest)",
   ]),
+  monthly: z.number().multipleOf(0.01).default(0),
 });
 
 const downpaymentAndInstallmentWithInterestSchema = z.object({
   paymentPlan: z.literal("Downpayment and Installment (with interest)"),
-  terms: z.enum(["1", "2", "3", "4", "5"]).pipe(z.coerce.number()),
+  terms: z.enum(["12", "24", "36", "48", "60"]).pipe(z.coerce.number()),
   downpayment: z
     .enum(["0.1", "0.2", "0.3", "0.4", "0.5"])
     .pipe(z.coerce.number()),
@@ -709,7 +881,6 @@ const downpaymentAndInstallmentWithInterestSchema = z.object({
 
 const downpaymentAndInstallmentWithoutInterestSchema = z.object({
   paymentPlan: z.literal("Downpayment and Installment (without interest)"),
-  terms: z.enum(["1", "2", "3", "4", "5"]).pipe(z.coerce.number()).optional(),
   downpayment: z
     .enum(["0.3", "0.4", "0.5", "0.6", "0.7", "0.8"])
     .pipe(z.coerce.number()),
@@ -775,6 +946,27 @@ async function handleGetBlocks(propertyId: number) {
 async function handleGetLots(blockId: number) {
   const block = blocks.value.find((block: any) => block.id === blockId);
   lots.value = block?.lots.filter((lot: Lot) => !lot.taken) || [];
+}
+
+function handleCalculateMonthly(values: any) {
+  const { downpayment = 0, terms, actualPrice } = values;
+  const priceAfterDownpayment = actualPrice - actualPrice * downpayment;
+  return (
+    priceAfterDownpayment *
+    withInterestFactors[terms as keyof typeof withInterestFactors]
+  );
+}
+
+function handleCalculateTotalInterest(values: any) {
+  const { terms, actualPrice, downpayment = 0 } = values;
+  const monthly = handleCalculateMonthly(values);
+  const downpaymentPrice = actualPrice * downpayment;
+
+  return (
+    Math.round(
+      (monthly * terms + downpaymentPrice - actualPrice + Number.EPSILON) * 100
+    ) / 100
+  );
 }
 
 function getClientInfo(values: any) {
@@ -848,8 +1040,7 @@ async function handleCreateClient(values: any) {
     body = {
       ...getLotInfo(values),
       perpetualCarePrice: values.lotPrice * 0.1,
-      totalInterest:
-        values.inNeed === "Yes" ? values.lotPrice * values.inNeedPrice : 0,
+      totalInterest: values.totalInterest,
       clientId: response.client.id,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
       createdOn: useDateFormat(new Date(), "MM-DD-YYYY").value,
@@ -883,8 +1074,7 @@ async function handleCreateClient(values: any) {
       await $fetch("/api/payment-plans/create", {
         method: "POST",
         body: {
-          downpayment: values.downpayment,
-          price: values.actualPrice,
+          paymentDue: values.monthly,
           clientLotId: response.clientLot.id,
           dateOfPayment: values.dateOfPayment,
           terms: values.terms,
@@ -901,7 +1091,7 @@ async function handleCreateClient(values: any) {
     emit("refresh");
     dialogState.value = false;
   } catch (error: any) {
-    console.log(error.response);
+    console.log(error);
     toast({
       title: "Error",
       description: "Something went wrong.",

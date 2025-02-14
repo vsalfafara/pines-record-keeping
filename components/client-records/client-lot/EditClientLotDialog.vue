@@ -88,16 +88,11 @@
             <Input
               type="text"
               class="mt-1"
-              :default-value="clientLotData.terms || undefined"
-              disabled
-            />
-          </div>
-          <div>
-            <Label>Downpayment</Label>
-            <Input
-              type="text"
-              class="mt-1"
-              :default-value="clientLotData.downpayment || undefined"
+              :default-value="
+                clientLotData.terms
+                  ? `${clientLotData.terms} months`
+                  : undefined
+              "
               disabled
             />
           </div>
@@ -111,11 +106,24 @@
             />
           </div>
           <div>
-            <Label>Month to Pay</Label>
+            <Label>Downpayment</Label>
             <Input
               type="text"
               class="mt-1"
-              :default-value="clientLotData.monthsToPay || undefined"
+              :default-value="
+                clientLotData.downpayment
+                  ? `${Number(clientLotData.downpayment) * 100}%`
+                  : undefined
+              "
+              disabled
+            />
+          </div>
+          <div>
+            <Label>Downpayment Price</Label>
+            <Input
+              type="text"
+              class="mt-1"
+              :default-value="toPHP.format(clientLotData.downpaymentPrice || 0)"
               disabled
             />
           </div>
