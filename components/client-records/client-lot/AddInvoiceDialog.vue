@@ -239,7 +239,7 @@ let formSchema = toTypedSchema(
     purpose: z.enum(["Payment Plan", "Interment", "Perpetual Care"], {
       message: "Please select a purpose",
     }),
-    payment: z.number({ message: "Please enter an amount" }),
+    payment: z.number({ message: "Please enter an amount" }).multipleOf(0.01),
     modeOfPayment: z.enum(["Bank Transfer", "Cash Payment", "Check Payment"], {
       message: "Please select a mode of payment",
     }),

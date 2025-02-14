@@ -225,6 +225,8 @@
                   v-bind="componentField"
                   @update:model-value="
                     () => {
+                      const totalInterest =
+                        handleCalculateTotalInterest(values);
                       setFieldValue(
                         'monthly',
                         Math.round(
@@ -235,9 +237,10 @@
                             100
                         ) / 100
                       );
+                      setFieldValue('totalInterest', totalInterest);
                       setFieldValue(
-                        'totalInterest',
-                        handleCalculateTotalInterest(values)
+                        'actualPrice',
+                        Number((values.lotPrice + totalInterest).toFixed(2))
                       );
                     }
                   "
@@ -277,24 +280,28 @@
                 <Select
                   v-bind="componentField"
                   @update:model-value="
-                    (v: any) => {
+                    () => {
+                      const totalInterest =
+                        handleCalculateTotalInterest(values);
                       setFieldValue(
                         'monthly',
                         Math.round(
-                          (handleCalculateMonthly({
-                            ...values,
-                          }) +
-                            Number.EPSILON) *
+                          (handleCalculateMonthly(values) + Number.EPSILON) *
                             100
                         ) / 100
                       );
-                      setFieldValue(
-                        'totalInterest',
-                        handleCalculateTotalInterest(values)
-                      );
+                      setFieldValue('totalInterest', totalInterest);
                       setFieldValue(
                         'downpaymentPrice',
-                        values.actualPrice * Number(v)
+                        Number(
+                          (
+                            values.lotPrice * Number(values.downpayment)
+                          ).toFixed(2)
+                        )
+                      );
+                      setFieldValue(
+                        'actualPrice',
+                        Number((values.lotPrice + totalInterest).toFixed(2))
                       );
                     }
                   "
@@ -430,36 +437,40 @@
                       v-bind="componentField"
                       @update:model-value="
                         (v: any) => {
-                          let actualPrice = values.lotPrice;
+                          let lotPrice = values.lotPrice;
+                          const totalInterest = handleCalculateTotalInterest({
+                            ...values,
+                            lotPrice,
+                          });
                           if (values.inNeed === 'Yes') {
                             if (values.inNeedPrice)
-                              actualPrice =
-                                actualPrice +
-                                actualPrice * parseFloat(values.inNeedPrice);
+                              lotPrice =
+                                lotPrice +
+                                lotPrice * parseFloat(values.inNeedPrice);
                           }
-                          actualPrice -= v;
-                          setFieldValue('actualPrice', actualPrice);
+                          lotPrice -= v;
+                          setFieldValue(
+                            'actualPrice',
+                            lotPrice + totalInterest
+                          );
                           setFieldValue(
                             'monthly',
                             Math.round(
                               (handleCalculateMonthly({
                                 ...values,
-                                actualPrice,
+                                lotPrice,
                               }) +
                                 Number.EPSILON) *
                                 100
                             ) / 100
                           );
-                          setFieldValue(
-                            'totalInterest',
-                            handleCalculateTotalInterest({
-                              ...values,
-                              actualPrice,
-                            })
-                          );
+                          setFieldValue('totalInterest', totalInterest);
+
                           setFieldValue(
                             'downpaymentPrice',
-                            values.actualPrice * Number(values.downpayment)
+                            Number(
+                              (lotPrice * Number(values.downpayment)).toFixed(2)
+                            )
                           );
                         }
                       "
@@ -470,7 +481,16 @@
                 <FormMessage />
               </FormItem>
             </FormField>
-            <FormField v-slot="{ componentField }" name="downpaymentPrice">
+            <FormField
+              v-if="
+                [
+                  'Downpayment and Installment (with interest)',
+                  'Downpayment and Installment (without interest)',
+                ].includes(values.paymentPlan)
+              "
+              v-slot="{ componentField }"
+              name="downpaymentPrice"
+            >
               <FormItem>
                 <FormLabel>Downpayment Price</FormLabel>
                 <FormControl>
@@ -706,8 +726,8 @@ const paymentTypes = ref<string[]>([
 
 const paymentPlans = ref<string[]>([
   "Downpayment and Installment (with interest)",
-  "Downpayment and Installment (without interest)",
-  // "Installment only (with interest)",
+  // "Downpayment and Installment (without interest)",
+  "Installment only (with interest)",
 ]);
 
 const terms = ref<number[]>([12, 24, 36, 48, 60]);
@@ -771,17 +791,23 @@ const downpaymentAndInstallmentWithInterestSchema = z.object({
     .pipe(z.coerce.number()),
 });
 
-const downpaymentAndInstallmentWithoutInterestSchema = z.object({
-  paymentPlan: z.literal("Downpayment and Installment (without interest)"),
-  downpayment: z
-    .enum(["0.3", "0.4", "0.5", "0.6", "0.7", "0.8"])
-    .pipe(z.coerce.number()),
+// const downpaymentAndInstallmentWithoutInterestSchema = z.object({
+//   paymentPlan: z.literal("Downpayment and Installment (without interest)"),
+//   downpayment: z
+//     .enum(["0.3", "0.4", "0.5", "0.6", "0.7", "0.8"])
+//     .pipe(z.coerce.number()),
+// });
+
+const installmentOnlySchema = z.object({
+  paymentPlan: z.literal("Installment only (with interest)"),
+  terms: z.enum(["12", "24", "36", "48", "60"]).pipe(z.coerce.number()),
 });
 
 const monthlyTermsFormSchema = z
   .discriminatedUnion("paymentPlan", [
     downpaymentAndInstallmentWithInterestSchema,
-    downpaymentAndInstallmentWithoutInterestSchema,
+    // downpaymentAndInstallmentWithoutInterestSchema,
+    installmentOnlySchema,
   ])
   .and(baseSchema);
 
@@ -841,8 +867,8 @@ async function handleGetLots(blockId: number) {
 }
 
 function handleCalculateMonthly(values: any) {
-  const { downpayment = 0, terms, actualPrice } = values;
-  const priceAfterDownpayment = actualPrice - actualPrice * downpayment;
+  const { downpayment = 0, terms, lotPrice } = values;
+  const priceAfterDownpayment = lotPrice - lotPrice * downpayment;
   return (
     priceAfterDownpayment *
     withInterestFactors[terms as keyof typeof withInterestFactors]
@@ -850,13 +876,13 @@ function handleCalculateMonthly(values: any) {
 }
 
 function handleCalculateTotalInterest(values: any) {
-  const { terms, actualPrice, downpayment = 0 } = values;
+  const { terms, lotPrice, downpayment = 0 } = values;
   const monthly = handleCalculateMonthly(values);
-  const downpaymentPrice = actualPrice * downpayment;
+  const downpaymentPrice = lotPrice * downpayment;
 
   return (
     Math.round(
-      (monthly * terms + downpaymentPrice - actualPrice + Number.EPSILON) * 100
+      (monthly * terms + downpaymentPrice - lotPrice + Number.EPSILON) * 100
     ) / 100
   );
 }
@@ -936,12 +962,28 @@ async function handleCreateClient(values: any) {
       method: "PUT",
       body: { taken: true },
     });
+    let purpose = "";
+    let payment = 0;
+
+    if (values.paymentType === "Monthly Terms") {
+      if (values.paymentPlan === "Installment only (with interest)") {
+        purpose = "Payment Plan";
+        payment = values.monthly;
+      } else {
+        purpose = "Downpayment";
+        payment = values.downpaymentPrice;
+      }
+    } else {
+      purpose = "Full Payment";
+      payment = values.actualPrice;
+    }
+
     const receipt = await handleUploadReceipt(values.receipt);
     body = {
       ...values,
-      payment: values.actualPrice,
+      payment,
       clientLotId: response.clientLot.id,
-      purpose: "Full Payment",
+      purpose,
       receipt,
       createdBy: `${sessionData.firstName} ${sessionData.lastName}`,
       createdOn: useDateFormat(new Date(), "MM-DD-YYYY").value,
