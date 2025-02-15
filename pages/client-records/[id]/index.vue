@@ -81,7 +81,7 @@
                         v-bind="componentField"
                         placeholder="Select Date"
                         :formatter="{
-                          date: 'MM-DD-YYYY',
+                          date: 'YYYY-MM-DD',
                           month: 'MMMM',
                         }"
                         as-single

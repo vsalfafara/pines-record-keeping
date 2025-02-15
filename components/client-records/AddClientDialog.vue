@@ -257,17 +257,6 @@
                 <RadioGroup
                   class="flex flex-col space-y-1"
                   v-bind="componentField"
-                  @update:model-value="
-                    () => {
-                      const lot = lots.find(
-                        (lot) => lot.id === parseInt(values.lotId)
-                      );
-                      if (lot) {
-                        setFieldValue('lotPrice', lot.price);
-                        setFieldValue('actualPrice', lot.price);
-                      }
-                    }
-                  "
                 >
                   <FormItem
                     v-for="paymentType in paymentTypes"
@@ -294,6 +283,22 @@
                   <RadioGroup
                     class="flex flex-col space-y-1"
                     v-bind="componentField"
+                    @update:model-value="
+                      () => {
+                        const lot = lots.find(
+                          (lot) => lot.id === parseInt(values.lotId)
+                        );
+                        if (lot) {
+                          setFieldValue('lotPrice', lot.price);
+                          setFieldValue('actualPrice', lot.price);
+                        }
+                        setFieldValue('downpaymentPrice', 0);
+                        setFieldValue('monthly', 0);
+                        setFieldValue('totalInterest', 0);
+                        setFieldValue('downpayment', undefined, false);
+                        setFieldValue('terms', undefined, false);
+                      }
+                    "
                   >
                     <FormItem
                       v-for="paymentPlan in paymentPlans"
@@ -316,62 +321,6 @@
               v-if="
                 [
                   'Downpayment and Installment (with interest)',
-                  'Installment only (with interest)',
-                ].includes(values.paymentPlan)
-              "
-              v-slot="{ componentField }"
-              name="terms"
-            >
-              <FormItem>
-                <FormLabel>Terms *</FormLabel>
-                <Select
-                  v-bind="componentField"
-                  @update:model-value="
-                    () => {
-                      const totalInterest =
-                        handleCalculateTotalInterest(values);
-                      setFieldValue(
-                        'monthly',
-                        Math.round(
-                          (handleCalculateMonthly({
-                            ...values,
-                          }) +
-                            Number.EPSILON) *
-                            100
-                        ) / 100
-                      );
-                      setFieldValue('totalInterest', totalInterest);
-                      setFieldValue(
-                        'actualPrice',
-                        Number((values.lotPrice + totalInterest).toFixed(2))
-                      );
-                    }
-                  "
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a term" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem
-                        v-for="term in terms"
-                        :key="term"
-                        :value="term.toString()"
-                      >
-                        {{ term }} Months
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-            <FormField
-              v-if="
-                [
-                  'Downpayment and Installment (with interest)',
                   'Downpayment and Installment (without interest)',
                 ].includes(values.paymentPlan)
               "
@@ -383,30 +332,7 @@
                 <Select
                   v-bind="componentField"
                   @update:model-value="
-                    () => {
-                      const totalInterest =
-                        handleCalculateTotalInterest(values);
-                      setFieldValue(
-                        'monthly',
-                        Math.round(
-                          (handleCalculateMonthly(values) + Number.EPSILON) *
-                            100
-                        ) / 100
-                      );
-                      setFieldValue('totalInterest', totalInterest);
-                      setFieldValue(
-                        'downpaymentPrice',
-                        Number(
-                          (
-                            values.lotPrice * Number(values.downpayment)
-                          ).toFixed(2)
-                        )
-                      );
-                      setFieldValue(
-                        'actualPrice',
-                        Number((values.lotPrice + totalInterest).toFixed(2))
-                      );
-                    }
+                    () => computeForDownpayment(values, setFieldValue)
                   "
                 >
                   <FormControl>
@@ -432,6 +358,49 @@
                 <FormMessage />
               </FormItem>
             </FormField>
+            <FormField
+              v-if="
+                [
+                  'Downpayment and Installment (with interest)',
+                  'Installment only (with interest)',
+                ].includes(values.paymentPlan)
+              "
+              v-slot="{ componentField }"
+              name="terms"
+            >
+              <FormItem>
+                <FormLabel>Terms *</FormLabel>
+                <Select
+                  v-bind="componentField"
+                  @update:model-value="
+                    () => computeForMonthly(values, setFieldValue)
+                  "
+                  :disabled="
+                    values.paymentPlan !== 'Installment only (with interest)' &&
+                    !values.downpayment
+                  "
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a term" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="term in terms"
+                        :key="term"
+                        :value="term.toString()"
+                      >
+                        {{ term }} Months
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
             <FormField
               v-if="
                 values.paymentPlan ===
@@ -469,6 +438,13 @@
                           let actualPrice = values.lotPrice;
                           actualPrice -= values.discount | 0;
                           setFieldValue('actualPrice', actualPrice);
+                        }
+                        const lot = lots.find(
+                          (lot) => lot.id === parseInt(values.lotId)
+                        );
+                        if (lot) {
+                          setFieldValue('lotPrice', lot.price);
+                          setFieldValue('actualPrice', lot.price);
                         }
                       }
                     "
@@ -539,43 +515,7 @@
                       default-value="0"
                       v-bind="componentField"
                       @update:model-value="
-                        (v: any) => {
-                          let lotPrice = values.lotPrice;
-                          const totalInterest = handleCalculateTotalInterest({
-                            ...values,
-                            lotPrice,
-                          });
-                          if (values.inNeed === 'Yes') {
-                            if (values.inNeedPrice)
-                              lotPrice =
-                                lotPrice +
-                                lotPrice * parseFloat(values.inNeedPrice);
-                          }
-                          lotPrice -= v;
-                          setFieldValue(
-                            'actualPrice',
-                            lotPrice + totalInterest
-                          );
-                          setFieldValue(
-                            'monthly',
-                            Math.round(
-                              (handleCalculateMonthly({
-                                ...values,
-                                lotPrice,
-                              }) +
-                                Number.EPSILON) *
-                                100
-                            ) / 100
-                          );
-                          setFieldValue('totalInterest', totalInterest);
-
-                          setFieldValue(
-                            'downpaymentPrice',
-                            Number(
-                              (lotPrice * Number(values.downpayment)).toFixed(2)
-                            )
-                          );
-                        }
+                        () => computeForDownpayment(values, setFieldValue)
                       "
                     />
                     <span class="absolute pl-3"> ₱ </span>
@@ -974,25 +914,43 @@ async function handleGetLots(blockId: number) {
   lots.value = block?.lots.filter((lot: Lot) => !lot.taken) || [];
 }
 
-function handleCalculateMonthly(values: any) {
-  const { downpayment = 0, terms, lotPrice } = values;
-  const priceAfterDownpayment = lotPrice - lotPrice * downpayment;
-  return (
-    priceAfterDownpayment *
-    withInterestFactors[terms as keyof typeof withInterestFactors]
+function computeForDownpayment(values: any, setFieldValue: any) {
+  const discount = values.discount || 0;
+  setFieldValue(
+    "downpaymentPrice",
+    (values.lotPrice - discount) * values.downpayment
   );
+  if (values.monthly) computeForMonthly(values, setFieldValue);
 }
 
-function handleCalculateTotalInterest(values: any) {
-  const { terms, lotPrice, downpayment = 0 } = values;
-  const monthly = handleCalculateMonthly(values);
-  const downpaymentPrice = lotPrice * downpayment;
-
-  return (
-    Math.round(
-      (monthly * terms + downpaymentPrice - lotPrice + Number.EPSILON) * 100
-    ) / 100
+function computeForMonthly(values: any, setFieldValue: any) {
+  const discount = values.discount || 0;
+  const monthly = Number(
+    (
+      (values.lotPrice - discount - (values.downpaymentPrice || 0)) *
+      withInterestFactors[values.terms as keyof typeof withInterestFactors]
+    ).toFixed(2)
   );
+  setFieldValue("monthly", monthly);
+  computeForTotalInterest(values, setFieldValue);
+}
+
+function computeForTotalInterest(values: any, setFieldValue: any) {
+  const discount = values.discount || 0;
+  const totalPrice = values.monthly * values.terms;
+  const downpaymentPrice = values.downpaymentPrice || 0;
+  const totalInterest =
+    totalPrice + downpaymentPrice - (values.lotPrice - discount);
+  setFieldValue("totalInterest", Number(totalInterest.toFixed(2)));
+  computeForActualPrice(values, setFieldValue);
+}
+
+function computeForActualPrice(values: any, setFieldValue: any) {
+  const discount = values.discount || 0;
+  const actualPrice = Number(
+    (values.lotPrice - discount + values.totalInterest).toFixed(2)
+  );
+  setFieldValue("actualPrice", actualPrice);
 }
 
 function getClientInfo(values: any) {
