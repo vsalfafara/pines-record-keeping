@@ -292,6 +292,7 @@
                           setFieldValue('lotPrice', lot.price);
                           setFieldValue('actualPrice', lot.price);
                         }
+                        setFieldValue('discount', 0);
                         setFieldValue('downpaymentPrice', 0);
                         setFieldValue('monthly', 0);
                         setFieldValue('totalInterest', 0);
@@ -515,7 +516,23 @@
                       default-value="0"
                       v-bind="componentField"
                       @update:model-value="
-                        () => computeForDownpayment(values, setFieldValue)
+                        () => {
+                          if (
+                            values.paymentPlan ===
+                            'Installment only (with interest)'
+                          ) {
+                            computeForMonthly(values, setFieldValue);
+                          } else if (
+                            [
+                              'Downpayment and Installment (with interest)',
+                              'Downpayment and Installment (without interest)',
+                            ].includes(values.paymentPlan)
+                          ) {
+                            computeForDownpayment(values, setFieldValue);
+                          } else if (values.paymentType === 'Full Payment') {
+                            computeForActualPrice(values, setFieldValue);
+                          }
+                        }
                       "
                     />
                     <span class="absolute pl-3"> ₱ </span>
@@ -816,9 +833,9 @@ const baseSchema = z.object({
   remarks: z.string().optional(),
   terms: z.any().pipe(z.coerce.number()).optional(),
   downpayment: z.any().pipe(z.coerce.number()).optional(),
-  downpaymentPrice: z.number().multipleOf(0.01).optional().default(0),
-  totalInterest: z.number().multipleOf(0.01).optional().default(0),
-  monthly: z.number().multipleOf(0.01).optional().default(0),
+  downpaymentPrice: z.number().multipleOf(0.01).default(0).optional(),
+  totalInterest: z.number().multipleOf(0.01).default(0).optional(),
+  monthly: z.number().multipleOf(0.01).default(0).optional(),
 });
 
 const monthlyTermsSchema = z.object({
@@ -834,9 +851,6 @@ const monthlyTermsSchema = z.object({
 const downpaymentAndInstallmentWithInterestSchema = z.object({
   paymentPlan: z.literal("Downpayment and Installment (with interest)"),
   terms: z.enum(["12", "24", "36", "48", "60"]).pipe(z.coerce.number()),
-  downpayment: z
-    .enum(["0.1", "0.2", "0.3", "0.4", "0.5"])
-    .pipe(z.coerce.number()),
 });
 
 // const downpaymentAndInstallmentWithoutInterestSchema = z.object({
@@ -849,6 +863,7 @@ const downpaymentAndInstallmentWithInterestSchema = z.object({
 const installmentOnlySchema = z.object({
   paymentPlan: z.literal("Installment only (with interest)"),
   terms: z.enum(["12", "24", "36", "48", "60"]).pipe(z.coerce.number()),
+  downpaymentPrice: z.number().multipleOf(0.01).default(0).optional(),
 });
 
 const monthlyTermsFormSchema = z
@@ -925,9 +940,10 @@ function computeForDownpayment(values: any, setFieldValue: any) {
 
 function computeForMonthly(values: any, setFieldValue: any) {
   const discount = values.discount || 0;
+  const downpaymentPrice = values.downpaymentPrice || 0;
   const monthly = Number(
     (
-      (values.lotPrice - discount - (values.downpaymentPrice || 0)) *
+      (values.lotPrice - discount - downpaymentPrice) *
       withInterestFactors[values.terms as keyof typeof withInterestFactors]
     ).toFixed(2)
   );
@@ -947,8 +963,9 @@ function computeForTotalInterest(values: any, setFieldValue: any) {
 
 function computeForActualPrice(values: any, setFieldValue: any) {
   const discount = values.discount || 0;
+  const totalInterest = values.totalInterest || 0;
   const actualPrice = Number(
-    (values.lotPrice - discount + values.totalInterest).toFixed(2)
+    (values.lotPrice - discount + totalInterest).toFixed(2)
   );
   setFieldValue("actualPrice", actualPrice);
 }

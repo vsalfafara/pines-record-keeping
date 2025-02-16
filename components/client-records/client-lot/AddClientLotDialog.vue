@@ -412,7 +412,23 @@
                       default-value="0"
                       v-bind="componentField"
                       @update:model-value="
-                        () => computeForDownpayment(values, setFieldValue)
+                        () => {
+                          if (
+                            values.paymentPlan ===
+                            'Installment only (with interest)'
+                          ) {
+                            computeForMonthly(values, setFieldValue);
+                          } else if (
+                            [
+                              'Downpayment and Installment (with interest)',
+                              'Downpayment and Installment (without interest)',
+                            ].includes(values.paymentPlan)
+                          ) {
+                            computeForDownpayment(values, setFieldValue);
+                          } else if (values.paymentType === 'Full Payment') {
+                            computeForActualPrice(values, setFieldValue);
+                          }
+                        }
                       "
                     />
                     <span class="absolute pl-3"> ₱ </span>
@@ -817,9 +833,10 @@ function computeForDownpayment(values: any, setFieldValue: any) {
 
 function computeForMonthly(values: any, setFieldValue: any) {
   const discount = values.discount || 0;
+  const downpaymentPrice = values.downpaymentPrice || 0;
   const monthly = Number(
     (
-      (values.lotPrice - discount - (values.downpaymentPrice || 0)) *
+      (values.lotPrice - discount - downpaymentPrice) *
       withInterestFactors[values.terms as keyof typeof withInterestFactors]
     ).toFixed(2)
   );
@@ -839,8 +856,9 @@ function computeForTotalInterest(values: any, setFieldValue: any) {
 
 function computeForActualPrice(values: any, setFieldValue: any) {
   const discount = values.discount || 0;
+  const totalInterest = values.totalInterest || 0;
   const actualPrice = Number(
-    (values.lotPrice - discount + values.totalInterest).toFixed(2)
+    (values.lotPrice - discount + totalInterest).toFixed(2)
   );
   setFieldValue("actualPrice", actualPrice);
 }
