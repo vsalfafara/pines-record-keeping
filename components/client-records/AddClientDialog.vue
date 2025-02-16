@@ -333,7 +333,14 @@
                 <Select
                   v-bind="componentField"
                   @update:model-value="
-                    () => computeForDownpayment(values, setFieldValue)
+                    () => {
+                      computeForDownpayment(values, setFieldValue);
+                      if (
+                        values.paymentPlan ===
+                        'Downpayment and Installment (without interest)'
+                      )
+                        computeForMonthly(values, setFieldValue);
+                    }
                   "
                 >
                   <FormControl>
@@ -359,16 +366,7 @@
                 <FormMessage />
               </FormItem>
             </FormField>
-            <FormField
-              v-if="
-                [
-                  'Downpayment and Installment (with interest)',
-                  'Installment only (with interest)',
-                ].includes(values.paymentPlan)
-              "
-              v-slot="{ componentField }"
-              name="terms"
-            >
+            <FormField v-slot="{ componentField }" name="terms">
               <FormItem>
                 <FormLabel>Terms *</FormLabel>
                 <Select
@@ -377,8 +375,11 @@
                     () => computeForMonthly(values, setFieldValue)
                   "
                   :disabled="
-                    values.paymentPlan !== 'Installment only (with interest)' &&
-                    !values.downpayment
+                    (values.paymentPlan !==
+                      'Installment only (with interest)' &&
+                      !values.downpayment) ||
+                    values.paymentPlan ===
+                      'Downpayment and Installment (without interest)'
                   "
                 >
                   <FormControl>
@@ -387,9 +388,23 @@
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectGroup>
+                    <SelectGroup
+                      v-if="
+                        values.paymentPlan !==
+                        'Downpayment and Installment (without interest)'
+                      "
+                    >
                       <SelectItem
                         v-for="term in terms"
+                        :key="term"
+                        :value="term.toString()"
+                      >
+                        {{ term }} Months
+                      </SelectItem>
+                    </SelectGroup>
+                    <SelectGroup v-else>
+                      <SelectItem
+                        v-for="term in withoutInterestTerms"
                         :key="term"
                         :value="term.toString()"
                       >
@@ -401,7 +416,6 @@
                 <FormMessage />
               </FormItem>
             </FormField>
-
             <FormField
               v-if="
                 values.paymentPlan ===
@@ -775,6 +789,14 @@ const withInterestFactors = {
   48: 0.029375,
   60: 0.025393,
 };
+const withoutInterestTerms = {
+  0.3: "4",
+  0.4: "6",
+  0.5: "8",
+  0.6: "10",
+  0.7: "12",
+  0.8: "3",
+};
 
 const paymentTypes = ref<string[]>([
   // "Reservation",
@@ -784,7 +806,7 @@ const paymentTypes = ref<string[]>([
 
 const paymentPlans = ref<string[]>([
   "Downpayment and Installment (with interest)",
-  // "Downpayment and Installment (without interest)",
+  "Downpayment and Installment (without interest)",
   "Installment only (with interest)",
 ]);
 
@@ -853,12 +875,13 @@ const downpaymentAndInstallmentWithInterestSchema = z.object({
   terms: z.enum(["12", "24", "36", "48", "60"]).pipe(z.coerce.number()),
 });
 
-// const downpaymentAndInstallmentWithoutInterestSchema = z.object({
-//   paymentPlan: z.literal("Downpayment and Installment (without interest)"),
-//   downpayment: z
-//     .enum(["0.3", "0.4", "0.5", "0.6", "0.7", "0.8"])
-//     .pipe(z.coerce.number()),
-// });
+const downpaymentAndInstallmentWithoutInterestSchema = z.object({
+  paymentPlan: z.literal("Downpayment and Installment (without interest)"),
+  downpayment: z
+    .enum(["0.3", "0.4", "0.5", "0.6", "0.7", "0.8"])
+    .pipe(z.coerce.number()),
+  terms: z.enum(["4", "6", "8", "10", "12", "3"]).pipe(z.coerce.number()),
+});
 
 const installmentOnlySchema = z.object({
   paymentPlan: z.literal("Installment only (with interest)"),
@@ -869,7 +892,7 @@ const installmentOnlySchema = z.object({
 const monthlyTermsFormSchema = z
   .discriminatedUnion("paymentPlan", [
     downpaymentAndInstallmentWithInterestSchema,
-    // downpaymentAndInstallmentWithoutInterestSchema,
+    downpaymentAndInstallmentWithoutInterestSchema,
     installmentOnlySchema,
   ])
   .and(baseSchema);
@@ -936,19 +959,42 @@ function computeForDownpayment(values: any, setFieldValue: any) {
     (values.lotPrice - discount) * values.downpayment
   );
   if (values.monthly) computeForMonthly(values, setFieldValue);
+  if (values.paymentPlan === "Downpayment and Installment (without interest)")
+    setFieldValue(
+      "terms",
+      withoutInterestTerms[
+        values.downpayment as keyof typeof withoutInterestTerms
+      ]
+    );
 }
 
 function computeForMonthly(values: any, setFieldValue: any) {
   const discount = values.discount || 0;
   const downpaymentPrice = values.downpaymentPrice || 0;
-  const monthly = Number(
-    (
-      (values.lotPrice - discount - downpaymentPrice) *
-      withInterestFactors[values.terms as keyof typeof withInterestFactors]
-    ).toFixed(2)
-  );
+  const monthly =
+    values.paymentPlan !== "Downpayment and Installment (without interest)"
+      ? Number(
+          (
+            (values.lotPrice - discount - downpaymentPrice) *
+            withInterestFactors[
+              values.terms as keyof typeof withInterestFactors
+            ]
+          ).toFixed(2)
+        )
+      : Number(
+          (
+            (values.lotPrice - discount - downpaymentPrice) /
+            Number(
+              withoutInterestTerms[
+                values.downpayment as keyof typeof withoutInterestTerms
+              ]
+            )
+          ).toFixed(2)
+        );
   setFieldValue("monthly", monthly);
-  computeForTotalInterest(values, setFieldValue);
+  if (values.paymentPlan !== "Downpayment and Installment (without interest)")
+    computeForTotalInterest(values, setFieldValue);
+  else computeForActualPrice(values, setFieldValue);
 }
 
 function computeForTotalInterest(values: any, setFieldValue: any) {
@@ -1095,6 +1141,9 @@ async function handleCreateClient(values: any) {
           clientLotId: response.clientLot.id,
           dateOfPayment: values.dateOfPayment,
           terms: values.terms,
+          withInterest:
+            values.paymentPlan !==
+            "Downpayment and Installment (without interest)",
         },
       });
     }

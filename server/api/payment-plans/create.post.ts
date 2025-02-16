@@ -6,7 +6,8 @@ import { paymentPlans } from "~/db/schema";
 export default defineEventHandler(async (event) => {
   try {
     const body: any = await readBody(event);
-    const { paymentDue, clientLotId, dateOfPayment, terms } = body;
+    const { paymentDue, clientLotId, dateOfPayment, terms, withInterest } =
+      body;
     const values = [];
     const date = new Date(dateOfPayment);
 
@@ -22,11 +23,16 @@ export default defineEventHandler(async (event) => {
         date.getMonth() + x + 1,
         0
       );
+      let discountedPaymentDue = paymentDue;
+      if (!withInterest && x + 1 === terms) {
+        discountedPaymentDue =
+          discountedPaymentDue - discountedPaymentDue * 0.05;
+      }
       values.push({
         clientLotId,
         installmentMonths: `${x + 1}/${terms}`,
         dueDate: useDateFormat(installmentMonths, "YYYY-MM-DD").value,
-        paymentDue,
+        paymentDue: discountedPaymentDue,
       });
     }
     return await db.insert(paymentPlans).values(values).returning();
