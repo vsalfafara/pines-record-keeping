@@ -78,7 +78,7 @@
                     class="pl-6"
                     type="number"
                     placeholder="0.00"
-                    default-value="0"
+                    step="0.01"
                     v-bind="componentField"
                     :disabled="values.purpose === 'Perpetual Care'"
                   />
@@ -217,29 +217,21 @@ const dialogState = ref<boolean>(false);
 
 const purposes = ref<string[]>(["Payment Plan", "Interment", "Perpetual Care"]);
 
-const paymentTypes = ref<string[]>([
-  // "Reservation",
-  // "Monthly Terms",
-  "Full Payment",
-]);
-
-const paymentPlans = ref<string[]>([
-  "Downpayment and Installment (with interest)",
-  "Downpayment and Installment (without interest)",
-  "Installment only (with interest)",
-]);
-
 const modeOfPayment = ref<string[]>([
   "Bank Transfer",
   "Cash Payment",
   "Check Payment",
 ]);
-let formSchema = toTypedSchema(
+const formSchema = toTypedSchema(
   z.object({
     purpose: z.enum(["Payment Plan", "Interment", "Perpetual Care"], {
       message: "Please select a purpose",
     }),
-    payment: z.number({ message: "Please enter an amount" }).multipleOf(0.01),
+    payment: z
+      .number({ message: "Please enter an amount" })
+      .min(0)
+      .multipleOf(0.01)
+      .default(0),
     modeOfPayment: z.enum(["Bank Transfer", "Cash Payment", "Check Payment"], {
       message: "Please select a mode of payment",
     }),

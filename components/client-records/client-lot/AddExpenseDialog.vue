@@ -78,7 +78,7 @@
                     class="pl-6"
                     type="number"
                     placeholder="0.00"
-                    default-value="0"
+                    step="0.01"
                     v-bind="componentField"
                     :disabled="values.purpose === 'Perpetual Care'"
                   />
@@ -234,12 +234,16 @@ const modeOfPayment = ref<string[]>([
   "Cash Payment",
   "Check Payment",
 ]);
-let formSchema = toTypedSchema(
+const formSchema = toTypedSchema(
   z.object({
     purpose: z.enum(["Agent Incentive", "Contractor"], {
       message: "Please select a purpose",
     }),
-    payment: z.number({ message: "Please enter an amount" }),
+    payment: z
+      .number({ message: "Please enter an amount" })
+      .min(0)
+      .multipleOf(0.01)
+      .default(0),
     modeOfPayment: z.enum(["Bank Transfer", "Cash Payment", "Check Payment"], {
       message: "Please select a mode of payment",
     }),
