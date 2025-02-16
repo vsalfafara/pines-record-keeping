@@ -167,7 +167,7 @@ export const expenses = t.pgTable("expenses", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
   clientLotId: t.integer("client_lot_id").notNull(),
   purpose: expensesPurposes().notNull(),
-  payment: t.integer().notNull(),
+  payment: t.doublePrecision().notNull(),
   modeOfPayment: modeOfPayments().notNull().default("Cash Payment"),
   dateOfPayment: t.date("date_of_payment", { mode: "string" }).notNull(),
   receipt: t.varchar("receipt").notNull(),
