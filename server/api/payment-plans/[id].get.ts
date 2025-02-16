@@ -24,9 +24,13 @@ export default defineEventHandler(async (event) => {
     );
 
     const paymentPlanRows = paymentPlansData.map((data) => {
+      const balance = (totalPaid -= data.paymentDue);
+      const dueDate = new Date(data.dueDate);
+      const currentDate = new Date();
       let status = "Pending";
       let paid = 0;
-      const balance = (totalPaid -= data.paymentDue);
+
+      if (dueDate < currentDate) status = "Overdue";
 
       if (balance >= 0) {
         status = "Paid";

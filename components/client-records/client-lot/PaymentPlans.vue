@@ -42,7 +42,12 @@ const columns = [
     },
     cell: ({ row }) => {
       const status: string = row.getValue("status");
-      const variant = status === "Paid" ? "success" : "pending";
+      const variant =
+        status === "Paid"
+          ? "success"
+          : status === "Overdue"
+            ? "destructive"
+            : "pending";
       return h(Badge, { variant }, () => status);
     },
   }),
