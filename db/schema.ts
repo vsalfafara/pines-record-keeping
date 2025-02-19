@@ -117,7 +117,10 @@ export const clientLots = t.pgTable("client_lots", {
 
 export const paymentPlans = t.pgTable("payment_plans", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-  clientLotId: t.integer("client_lot_id").notNull(),
+  clientLotId: t
+    .integer("client_lot_id")
+    .notNull()
+    .references(() => clientLots.id, { onDelete: "cascade" }),
   installmentMonths: t.varchar("installment_months"),
   dueDate: t.date("due_date", { mode: "string" }).notNull(),
   paymentDue: t.doublePrecision("payment_due").notNull(),
@@ -125,7 +128,10 @@ export const paymentPlans = t.pgTable("payment_plans", {
 
 export const interments = t.pgTable("interments", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-  clientLotId: t.integer("client_lot_id").notNull(),
+  clientLotId: t
+    .integer("client_lot_id")
+    .notNull()
+    .references(() => clientLots.id, { onDelete: "cascade" }),
   dig: t.integer("dig"),
   type: intermentTypes(),
   deceasedName: t.varchar("deceased_name"),
@@ -144,7 +150,10 @@ export const interments = t.pgTable("interments", {
 
 export const perpetualCares = t.pgTable("perpetual_cares", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-  clientLotId: t.integer("client_lot_id").notNull(),
+  clientLotId: t
+    .integer("client_lot_id")
+    .notNull()
+    .references(() => clientLots.id, { onDelete: "cascade" }),
   installmentYears: t.varchar("installment_years"),
   dueDate: t.date("due_date", { mode: "string" }).notNull(),
   paymentDue: t.doublePrecision("payment_due").notNull(),
@@ -152,7 +161,10 @@ export const perpetualCares = t.pgTable("perpetual_cares", {
 
 export const invoices = t.pgTable("invoices", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-  clientLotId: t.integer("client_lot_id").notNull(),
+  clientLotId: t
+    .integer("client_lot_id")
+    .notNull()
+    .references(() => clientLots.id, { onDelete: "cascade" }),
   purpose: invoicePurposes().notNull(),
   payment: t.doublePrecision().notNull(),
   modeOfPayment: modeOfPayments().notNull().default("Cash Payment"),
@@ -165,7 +177,10 @@ export const invoices = t.pgTable("invoices", {
 
 export const expenses = t.pgTable("expenses", {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-  clientLotId: t.integer("client_lot_id").notNull(),
+  clientLotId: t
+    .integer("client_lot_id")
+    .notNull()
+    .references(() => clientLots.id, { onDelete: "cascade" }),
   purpose: expensesPurposes().notNull(),
   payment: t.doublePrecision().notNull(),
   modeOfPayment: modeOfPayments().notNull().default("Cash Payment"),

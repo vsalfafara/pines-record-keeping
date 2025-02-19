@@ -27,6 +27,7 @@ import EditClientButton from "~/components/client-records/EditClientButton.vue";
 import type { Client } from "~/db/schema";
 import type { BreadcrumbType } from "~/lib/types";
 import DataTable from "~/components/custom/DataTable.vue";
+import DeleteClientDialog from "~/components/client-records/DeleteClientDialog.vue";
 
 const breadcrumbs = ref<BreadcrumbType[]>([
   {
@@ -39,7 +40,7 @@ const clients = ref<Client[]>([]);
 const loading = ref<boolean>(false);
 
 const columnHelper = createColumnHelper<Client>();
-
+const { user } = useUserSession();
 const columns = [
   columnHelper.accessor("firstName", {
     header: ({ column }) => {
@@ -135,6 +136,10 @@ const columns = [
       const actions = [];
 
       actions.push(h(EditClientButton, { client }));
+      if (user.value?.role === "ADMIN")
+        actions.push(
+          h(DeleteClientDialog, { client, onRefresh: handleGetClients })
+        );
 
       return h(
         "div",
