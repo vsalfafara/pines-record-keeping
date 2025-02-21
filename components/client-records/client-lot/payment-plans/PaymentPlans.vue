@@ -154,9 +154,13 @@ const columns = [
     enableHiding: false,
     cell: ({ row }) => {
       const plan = row.original;
+      const disabled = plan.status === "Paid";
+
+      if (disabled) return null;
       return h(EditPaymentPlan, {
         paymentPlan: plan,
         onRefresh: handleGetPaymentPlans,
+        disabled,
       });
     },
   }),
