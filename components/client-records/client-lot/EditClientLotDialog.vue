@@ -236,7 +236,7 @@ import Invoices from "./Invoices.vue";
 import Expenses from "./Expenses.vue";
 import type { ClientLot } from "~/db/schema";
 import { Form } from "vee-validate";
-import PaymentPlans from "./PaymentPlans.vue";
+import PaymentPlans from "./payment-plans/PaymentPlans.vue";
 
 const { clientLotData } = defineProps<{
   clientLotData: ClientLot;

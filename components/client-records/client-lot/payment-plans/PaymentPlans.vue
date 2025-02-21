@@ -15,6 +15,7 @@ import type { ClientLot, PaymentPlan } from "~/db/schema";
 import { useDateFormat } from "@vueuse/core";
 import { Badge } from "~/components/ui/badge";
 import DataTable from "~/components/custom/DataTable.vue";
+import EditPaymentPlan from "./EditPaymentPlan.vue";
 
 const { clientLot } = defineProps<{ clientLot: ClientLot }>();
 
@@ -106,6 +107,34 @@ const columns = [
       ),
   }),
 
+  columnHelper.accessor("discount", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Discount", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) =>
+      h("div", { class: "px-4" }, toPHP.value.format(row.getValue("discount"))),
+  }),
+  columnHelper.accessor("penalty", {
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Penalty", h(ArrowUpDown, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) =>
+      h("div", { class: "px-4" }, toPHP.value.format(row.getValue("penalty"))),
+  }),
   columnHelper.accessor("paid", {
     header: ({ column }) => {
       return h(
@@ -119,6 +148,17 @@ const columns = [
     },
     cell: ({ row }) =>
       h("div", { class: "px-4" }, toPHP.value.format(row.getValue("paid"))),
+  }),
+  columnHelper.display({
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const plan = row.original;
+      return h(EditPaymentPlan, {
+        paymentPlan: plan,
+        onRefresh: handleGetPaymentPlans,
+      });
+    },
   }),
 ];
 
