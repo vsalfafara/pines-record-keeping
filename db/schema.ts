@@ -123,8 +123,8 @@ export const paymentPlans = t.pgTable("payment_plans", {
     .references(() => clientLots.id, { onDelete: "cascade" }),
   installmentMonths: t.varchar("installment_months"),
   dueDate: t.date("due_date", { mode: "string" }).notNull(),
-  discount: t.doublePrecision("discount").default(0),
-  penalty: t.doublePrecision("penalty").default(0),
+  discount: t.doublePrecision("discount").notNull().default(0),
+  penalty: t.doublePrecision("penalty").notNull().default(0),
   paymentDue: t.doublePrecision("payment_due").notNull(),
 });
 

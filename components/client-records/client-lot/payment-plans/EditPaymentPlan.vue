@@ -123,9 +123,12 @@ const formSchema = toTypedSchema(
 async function handleUpdateLot(values: any) {
   loading.value = true;
   try {
+    let paymentDue = paymentPlan.paymentDue;
+    paymentDue -= values.discount - paymentPlan.discount;
+    paymentDue += values.penalty - paymentPlan.penalty;
     const body = {
       ...values,
-      paymentDue: paymentPlan.paymentDue - values.discount + values.penalty,
+      paymentDue,
     };
     const response: any = await $fetch(`/api/payment-plans/${paymentPlan.id}`, {
       method: "PUT",
