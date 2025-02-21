@@ -159,7 +159,6 @@ const columns = [
       return h(EditPaymentPlan, {
         paymentPlan: plan,
         onRefresh: handleGetPaymentPlans,
-        disabled,
       });
     },
   }),
