@@ -111,6 +111,9 @@ const formSchema = toTypedSchema(
   z.object({
     discount: z
       .number({ message: "Please enter an amount" })
+      .max(paymentPlan.paymentDue, {
+        message: "Discount must not be more than the payment due",
+      })
       .min(0, { message: "Please enter an amount equal or more than 0" })
       .multipleOf(0.01),
     penalty: z
