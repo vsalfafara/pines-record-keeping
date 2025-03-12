@@ -358,7 +358,7 @@
                         :key="down"
                         :value="down.toString()"
                       >
-                        {{ down * 100 }}%
+                        {{ down === 0 ? "Manual" : `${down * 100}%` }}
                       </SelectItem>
                     </SelectGroup>
                   </SelectContent>
@@ -574,7 +574,10 @@
                       type="number"
                       :placeholder="values.downpaymentPrice"
                       v-bind="componentField"
-                      disabled
+                      :disabled="values.downpayment > 0 || !values.terms"
+                      @update:model-value="
+                        () => computeForMonthly(values, setFieldValue)
+                      "
                     />
                     <span class="absolute pl-3"> ₱ </span>
                   </div>
@@ -812,7 +815,7 @@ const paymentPlans = ref<string[]>([
 
 const terms = ref<number[]>([12, 24, 36, 48, 60]);
 
-const downpaymentWithInterest = ref<number[]>([0.1, 0.2, 0.3, 0.4, 0.5]);
+const downpaymentWithInterest = ref<number[]>([0, 0.1, 0.2, 0.3, 0.4, 0.5]);
 const downpaymentWithoutInterest = ref<number[]>([
   0.3, 0.4, 0.5, 0.6, 0.7, 0.8,
 ]);
@@ -873,6 +876,9 @@ const monthlyTermsSchema = z.object({
 const downpaymentAndInstallmentWithInterestSchema = z.object({
   paymentPlan: z.literal("Downpayment and Installment (with interest)"),
   terms: z.enum(["12", "24", "36", "48", "60"]).pipe(z.coerce.number()),
+  downpayment: z
+    .enum(["0", "0.1", "0.2", "0.3", "0.4", "0.5"])
+    .pipe(z.coerce.number().min(0)),
 });
 
 const downpaymentAndInstallmentWithoutInterestSchema = z.object({
@@ -954,10 +960,12 @@ async function handleGetLots(blockId: number) {
 
 function computeForDownpayment(values: any, setFieldValue: any) {
   const discount = values.discount || 0;
-  setFieldValue(
-    "downpaymentPrice",
-    (values.lotPrice - discount) * values.downpayment
-  );
+  if (values.downpayment !== 0.0) {
+    setFieldValue(
+      "downpaymentPrice",
+      (values.lotPrice - discount) * values.downpayment
+    );
+  }
   if (values.monthly) computeForMonthly(values, setFieldValue);
   if (values.paymentPlan === "Downpayment and Installment (without interest)")
     setFieldValue(
