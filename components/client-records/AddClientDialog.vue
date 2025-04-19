@@ -513,8 +513,18 @@
               </FormField>
             </template>
           </template>
-          <template v-if="values.inNeed || values.paymentPlan">
-            <FormField v-slot="{ componentField }" name="discount">
+          <template
+            v-if="
+              values.inNeed ||
+              values.paymentPlan ||
+              values.paymentType === 'Reservation'
+            "
+          >
+            <FormField
+              v-if="values.paymentType !== 'Reservation'"
+              v-slot="{ componentField }"
+              name="discount"
+            >
               <FormItem
                 :class="{
                   'col-span-2': values.inNeed === 'No',
@@ -620,6 +630,25 @@
                 </FormItem>
               </FormField>
             </template>
+            <template v-if="values.paymentType === 'Reservation'">
+              <FormField v-slot="{ componentField }" name="reservation">
+                <FormItem>
+                  <FormLabel>Reservation Fee *</FormLabel>
+                  <FormControl>
+                    <div class="relative flex items-center">
+                      <Input
+                        class="pl-6"
+                        type="number"
+                        :placeholder="values.reservation"
+                        v-bind="componentField"
+                      />
+                      <span class="absolute pl-3"> ₱ </span>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+            </template>
             <FormField v-slot="{ componentField }" name="lotPrice">
               <FormItem>
                 <FormLabel>Lot Price</FormLabel>
@@ -638,7 +667,11 @@
                 <FormMessage />
               </FormItem>
             </FormField>
-            <FormField v-slot="{ componentField }" name="actualPrice">
+            <FormField
+              v-if="values.paymentType !== 'Reservation'"
+              v-slot="{ componentField }"
+              name="actualPrice"
+            >
               <FormItem>
                 <FormLabel>Actual Price</FormLabel>
                 <FormControl>
@@ -802,7 +835,7 @@ const withoutInterestTerms = {
 };
 
 const paymentTypes = ref<string[]>([
-  // "Reservation",
+  "Reservation",
   "Monthly Terms",
   "Full Payment",
 ]);
@@ -861,6 +894,19 @@ const baseSchema = z.object({
   downpaymentPrice: z.number().multipleOf(0.01).default(0).optional(),
   totalInterest: z.number().multipleOf(0.01).default(0).optional(),
   monthly: z.number().multipleOf(0.01).default(0).optional(),
+});
+
+const reservationSchema = z.object({
+  paymentType: z.literal("Reservation"),
+  reservation: z.number(),
+  discount: z
+    .number({ message: "Please enter an amount" })
+    .min(0)
+    .multipleOf(0.01)
+    .optional()
+    .or(z.literal(0))
+    .optional(),
+  actualPrice: z.number().multipleOf(0.01).optional(),
 });
 
 const monthlyTermsSchema = z.object({
@@ -923,7 +969,11 @@ const inNeedFormSchema = z
   .and(baseSchema);
 
 const paymentTypeFormSchema = z
-  .discriminatedUnion("paymentType", [monthlyTermsSchema, fullPaymentSchema])
+  .discriminatedUnion("paymentType", [
+    reservationSchema,
+    monthlyTermsSchema,
+    fullPaymentSchema,
+  ])
   .and(baseSchema);
 
 const formSchema = toTypedSchema(
@@ -1112,7 +1162,10 @@ async function handleCreateClient(values: any) {
     let purpose = "";
     let payment = 0;
 
-    if (values.paymentType === "Monthly Terms") {
+    if (values.paymentType === "Reservation") {
+      purpose = "Reservation";
+      payment = values.reservation;
+    } else if (values.paymentType === "Monthly Terms") {
       if (values.paymentPlan === "Installment only (with interest)") {
         purpose = "Payment Plan";
         payment = values.monthly;
