@@ -10,12 +10,16 @@
             ><Pencil class="h-8 w-8 rounded-md bg-blue-50 p-2 text-blue-600"
           /></SheetTitle>
           <SheetDescription>
-            <div class="flex gap-2">
+            <div class="flex justify-between gap-2">
               <h3 class="mb-2 text-xl font-semibold text-slate-900">
                 {{ clientLotData.property.name }} |
                 {{ clientLotData.block.name }} |
                 {{ clientLotData.lot.name }}
               </h3>
+              <AddTerms
+                v-if="clientLotData.paymentType === 'Reservation'"
+                :lot="clientLotData.lot"
+              />
             </div>
           </SheetDescription>
         </SheetHeader>
@@ -228,7 +232,7 @@
 
 <script setup lang="ts">
 import { Button } from "~/components/ui/button";
-import { Pencil } from "lucide-vue-next";
+import { Pencil, Plus } from "lucide-vue-next";
 import { useDateFormat } from "@vueuse/core";
 import Interments from "./Interments.vue";
 import PerpetualCares from "./PerpetualCares.vue";
@@ -237,6 +241,7 @@ import Expenses from "./Expenses.vue";
 import type { ClientLot } from "~/db/schema";
 import { Form } from "vee-validate";
 import PaymentPlans from "./payment-plans/PaymentPlans.vue";
+import AddTerms from "./AddTerms.vue";
 
 const { clientLotData } = defineProps<{
   clientLotData: ClientLot;
